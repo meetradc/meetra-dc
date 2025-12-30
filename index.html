@@ -5,71 +5,82 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Meetra | Stop Scrolling, Start Meeting</title>
     <style>
-        :root { --blue: #3259e8; --gray: #f8f9fa; --text: #333; }
-        body { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; margin: 0; color: var(--text); background: white; }
+        :root { --blue: #3259e8; --dark: #1a202c; --gray: #f8f9fa; }
+        body { font-family: 'Helvetica Neue', Arial, sans-serif; margin: 0; color: var(--dark); }
         
-        /* Hero Section */
-        .hero { text-align: center; padding: 60px 20px 40px; }
-        h1 { font-size: 3.5rem; font-weight: 800; margin-bottom: 10px; letter-spacing: -1px; }
+        /* Layout Container */
+        .container { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
+        
+        /* Hero Section (Side-by-Side) */
+        .hero { display: flex; align-items: center; justify-content: space-between; padding: 80px 0; gap: 40px; }
+        .hero-text { flex: 1.2; }
+        .hero-form { flex: 0.8; background: white; padding: 30px; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); border: 1px solid #eee; }
+
+        h1 { font-size: 3.5rem; line-height: 1.1; margin-bottom: 20px; }
         h1 span { color: var(--blue); }
-        .tagline { font-size: 1.2rem; color: #666; max-width: 700px; margin: 0 auto 30px; line-height: 1.5; }
-        
-        /* Buttons */
-        .cta-group { display: flex; justify-content: center; gap: 15px; margin-bottom: 50px; }
-        .btn { padding: 16px 32px; border-radius: 12px; font-weight: 600; font-size: 1rem; cursor: pointer; border: none; transition: 0.2s; text-decoration: none; }
-        .btn-blue { background: var(--blue); color: white; box-shadow: 0 4px 14px rgba(50, 89, 232, 0.3); }
-        .btn-white { background: white; color: #444; border: 1px solid #ddd; }
-        .btn:hover { transform: translateY(-2px); opacity: 0.9; }
+        .tagline { font-size: 1.25rem; color: #555; margin-bottom: 30px; }
 
-        /* Feature Section */
-        .features-container { display: flex; justify-content: center; gap: 25px; padding: 40px 5%; background: #fcfcfc; flex-wrap: wrap; }
-        .feature-card { flex: 1; min-width: 300px; max-width: 350px; text-align: center; }
-        .feature-image { width: 100%; height: 200px; border-radius: 20px; object-fit: cover; margin-bottom: 20px; box-shadow: 0 8px 20px rgba(0,0,0,0.1); }
-        .feature-card h3 { font-size: 1.2rem; margin-bottom: 10px; font-weight: 700; }
-        .feature-card p { font-size: 0.95rem; color: #777; line-height: 1.4; padding: 0 10px; }
+        /* Form Styling */
+        input { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; }
+        .btn-broadcast { width: 100%; background: var(--blue); color: white; border: none; padding: 15px; border-radius: 8px; font-weight: bold; cursor: pointer; }
 
-        /* Lobby Form Hidden/Popup Style (Optional) */
-        .lobby-trigger { margin-top: 20px; font-size: 0.9rem; color: var(--blue); cursor: pointer; text-decoration: underline; }
+        /* Feature Cards (Small Pics) */
+        .features { display: grid; grid-template-columns: repeat(3, 1fr); gap: 30px; padding: 60px 0; background: var(--gray); }
+        .card { text-align: center; }
+        .card img { width: 100%; height: 180px; border-radius: 12px; object-fit: cover; margin-bottom: 15px; }
+        .card h3 { font-size: 1.1rem; margin-bottom: 8px; }
+        .card p { font-size: 0.9rem; color: #666; }
+
+        @media (max-width: 768px) {
+            .hero { flex-direction: column; text-align: center; }
+            .features { grid-template-columns: 1fr; }
+        }
     </style>
 </head>
 <body>
 
-    <section class="hero">
-        <h1>Stop Scrolling. <span>Start Meeting.</span></h1>
-        <p class="tagline">The social-local platform that turns shared interests into real-world hangouts at verified local spots.</p>
-        
-        <div class="cta-group">
-            <button class="btn btn-blue" onclick="toggleLobby()">Try the Demo</button>
-            <button class="btn btn-white">Business Inquiry</button>
+    <div class="container">
+        <section class="hero">
+            <div class="hero-text">
+                <h1>Stop Scrolling. <br><span>Start Meeting.</span></h1>
+                <p class="tagline">The social-local platform that turns shared interests into real-world hangouts at verified local spots.</p>
+                <div style="display: flex; gap: 10px;">
+                    <button style="padding: 12px 24px; border-radius: 8px; border: 1px solid #ddd; background: white;">Try the Demo</button>
+                    <button style="padding: 12px 24px; border-radius: 8px; border: none; background: #eee;">Business Inquiry</button>
+                </div>
+            </div>
+
+            <div class="hero-form">
+                <h3 style="margin-top: 0;">DC Live Lobby</h3>
+                <p style="font-size: 0.85rem; color: #777;">Broadcast your presence to see who's nearby.</p>
+                <form id="lobby-form">
+                    <input type="text" placeholder="Your Name" required>
+                    <input type="text" placeholder="What are you up for?" required>
+                    <button type="submit" class="btn-broadcast">Broadcast My Presence</button>
+                </form>
+            </div>
+        </section>
+    </div>
+
+    <section class="features">
+        <div class="container" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 30px;">
+            <div class="card">
+                <img src="https://images.unsplash.com/photo-1543269865-cbf427effbad?auto=format&fit=crop&w=400" alt="Meeting">
+                <h3>Instant Matchmaking</h3>
+                <p>Toggle "Active" to see who wants to grab coffee or play games right now.</p>
+            </div>
+            <div class="card">
+                <img src="https://images.unsplash.com/photo-1554118811-1e0d58224f24?auto=format&fit=crop&w=400" alt="Venue">
+                <h3>Hyperlocal Marketing</h3>
+                <p>Venues push time-sensitive offers to groups for meeting up.</p>
+            </div>
+            <div class="card">
+                <img src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=400" alt="Safe">
+                <h3>Safe Connections</h3>
+                <p>Interactions happen at verified public venues with safety filters.</p>
+            </div>
         </div>
     </section>
-
-    <section class="features-container">
-        <div class="feature-card">
-            <img src="https://images.unsplash.com/photo-1543269865-cbf427effbad?auto=format&fit=crop&w=400" class="feature-image" alt="People meeting">
-            <h3>Instant Matchmaking</h3>
-            <p>Toggle "Active" to see who wants to grab coffee or play board games right now.</p>
-        </div>
-
-        <div class="feature-card">
-            <img src="https://images.unsplash.com/photo-1554118811-1e0d58224f24?auto=format&fit=crop&w=400" class="feature-image" alt="Coffee shop">
-            <h3>Hyperlocal Marketing</h3>
-            <p>Venues push time-sensitive offers to groups, rewarding you for meeting up.</p>
-        </div>
-
-        <div class="feature-card">
-            <img src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=400" class="feature-image" alt="Safe group">
-            <h3>Safe Connections</h3>
-            <p>All interactions happen at verified public venues with built-in safety filters.</p>
-        </div>
-    </section>
-
-    <script>
-        function toggleLobby() {
-            alert("Lobby opening... connecting to Supabase!");
-            // We can add the form logic here so it pops up when they click 'Try the Demo'
-        }
-    </script>
 
 </body>
 </html>
