@@ -3,68 +3,73 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Meetra | Social Local Platform</title>
+    <title>Meetra | Stop Scrolling, Start Meeting</title>
     <style>
-        :root { --primary: #3182ce; --dark: #1a202c; --text: #4a5568; }
-        body { font-family: -apple-system, system-ui, sans-serif; margin: 0; color: var(--dark); line-height: 1.5; }
+        :root { --blue: #3259e8; --gray: #f8f9fa; --text: #333; }
+        body { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; margin: 0; color: var(--text); background: white; }
         
         /* Hero Section */
-        .hero { padding: 80px 20px; text-align: center; background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%); }
-        h1 { font-size: 3.5rem; margin-bottom: 1rem; line-height: 1.1; }
-        .tagline { font-size: 1.5rem; color: var(--text); max-width: 800px; margin: 0 auto 2rem; }
+        .hero { text-align: center; padding: 60px 20px 40px; }
+        h1 { font-size: 3.5rem; font-weight: 800; margin-bottom: 10px; letter-spacing: -1px; }
+        h1 span { color: var(--blue); }
+        .tagline { font-size: 1.2rem; color: #666; max-width: 700px; margin: 0 auto 30px; line-height: 1.5; }
         
-        /* Form & Buttons */
-        .cta-container { display: flex; justify-content: center; gap: 15px; margin-bottom: 40px; flex-wrap: wrap; }
-        .btn { padding: 12px 25px; border-radius: 8px; font-weight: bold; cursor: pointer; text-decoration: none; border: none; }
-        .btn-primary { background: var(--primary); color: white; }
-        .btn-outline { border: 2px solid var(--primary); color: var(--primary); background: transparent; }
+        /* Buttons */
+        .cta-group { display: flex; justify-content: center; gap: 15px; margin-bottom: 50px; }
+        .btn { padding: 16px 32px; border-radius: 12px; font-weight: 600; font-size: 1rem; cursor: pointer; border: none; transition: 0.2s; text-decoration: none; }
+        .btn-blue { background: var(--blue); color: white; box-shadow: 0 4px 14px rgba(50, 89, 232, 0.3); }
+        .btn-white { background: white; color: #444; border: 1px solid #ddd; }
+        .btn:hover { transform: translateY(-2px); opacity: 0.9; }
 
-        /* Lobby Form (Integrated) */
-        .lobby-card { background: white; padding: 30px; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); max-width: 400px; margin: 0 auto 60px; }
-        .lobby-card input { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #ddd; border-radius: 6px; box-sizing: border-box; }
+        /* Feature Section */
+        .features-container { display: flex; justify-content: center; gap: 25px; padding: 40px 5%; background: #fcfcfc; flex-wrap: wrap; }
+        .feature-card { flex: 1; min-width: 300px; max-width: 350px; text-align: center; }
+        .feature-image { width: 100%; height: 200px; border-radius: 20px; object-fit: cover; margin-bottom: 20px; box-shadow: 0 8px 20px rgba(0,0,0,0.1); }
+        .feature-card h3 { font-size: 1.2rem; margin-bottom: 10px; font-weight: 700; }
+        .feature-card p { font-size: 0.95rem; color: #777; line-height: 1.4; padding: 0 10px; }
 
-        /* Feature Boxes */
-        .features { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; padding: 60px 20px; max-width: 1100px; margin: 0 auto; }
-        .box { padding: 30px; background: #fff; border: 1px solid #e2e8f0; border-radius: 12px; text-align: center; transition: transform 0.2s; }
-        .box:hover { transform: translateY(-5px); border-color: var(--primary); }
-        .box h3 { color: var(--primary); margin-bottom: 10px; }
+        /* Lobby Form Hidden/Popup Style (Optional) */
+        .lobby-trigger { margin-top: 20px; font-size: 0.9rem; color: var(--blue); cursor: pointer; text-decoration: underline; }
     </style>
 </head>
 <body>
 
     <section class="hero">
-        <h1>Stop scrolling, start meeting.</h1>
-        <p class="tagline">The social local platform that turns shared interests into real-world hangouts at verified local spots.</p>
+        <h1>Stop Scrolling. <span>Start Meeting.</span></h1>
+        <p class="tagline">The social-local platform that turns shared interests into real-world hangouts at verified local spots.</p>
         
-        <div class="cta-container">
-            <a href="#" class="btn btn-primary">Book a Demo</a>
-            <a href="#" class="btn btn-outline">Business Inquiry</a>
-        </div>
-
-        <div class="lobby-card">
-            <h3>Enter the DC Lobby</h3>
-            <form id="lobby-form">
-                <input type="text" placeholder="Your Name" required>
-                <input type="text" placeholder="Interest (e.g. Tech, Coffee, Chess)" required>
-                <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 10px;">Broadcast My Presence</button>
-            </form>
+        <div class="cta-group">
+            <button class="btn btn-blue" onclick="toggleLobby()">Try the Demo</button>
+            <button class="btn btn-white">Business Inquiry</button>
         </div>
     </section>
 
-    <section class="features">
-        <div class="box">
+    <section class="features-container">
+        <div class="feature-card">
+            <img src="https://images.unsplash.com/photo-1543269865-cbf427effbad?auto=format&fit=crop&w=400" class="feature-image" alt="People meeting">
             <h3>Instant Matchmaking</h3>
-            <p>Connect with people nearby who share your exact interests in real-time.</p>
+            <p>Toggle "Active" to see who wants to grab coffee or play board games right now.</p>
         </div>
-        <div class="box">
+
+        <div class="feature-card">
+            <img src="https://images.unsplash.com/photo-1554118811-1e0d58224f24?auto=format&fit=crop&w=400" class="feature-image" alt="Coffee shop">
             <h3>Hyperlocal Marketing</h3>
-            <p>Discover verified local spots and exclusive offers tailored to your group.</p>
+            <p>Venues push time-sensitive offers to groups, rewarding you for meeting up.</p>
         </div>
-        <div class="box">
+
+        <div class="feature-card">
+            <img src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=400" class="feature-image" alt="Safe group">
             <h3>Safe Connections</h3>
-            <p>Verified venues and community moderation ensure a secure environment for all.</p>
+            <p>All interactions happen at verified public venues with built-in safety filters.</p>
         </div>
     </section>
+
+    <script>
+        function toggleLobby() {
+            alert("Lobby opening... connecting to Supabase!");
+            // We can add the form logic here so it pops up when they click 'Try the Demo'
+        }
+    </script>
 
 </body>
 </html>
