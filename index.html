@@ -3,51 +3,68 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Meetra DC Lobby</title>
+    <title>Meetra | Social Local Platform</title>
     <style>
-        body { font-family: -apple-system, sans-serif; margin: 0; display: flex; min-height: 100vh; background: #f4f7f6; }
+        :root { --primary: #3182ce; --dark: #1a202c; --text: #4a5568; }
+        body { font-family: -apple-system, system-ui, sans-serif; margin: 0; color: var(--dark); line-height: 1.5; }
         
-        /* Main Section */
-        .objective-section { flex: 1; padding: 60px; display: flex; flex-direction: column; justify-content: center; }
-        h1 { font-size: 3rem; color: #1a202c; margin-bottom: 20px; }
-        p.mission { font-size: 1.25rem; color: #4a5568; line-height: 1.6; max-width: 600px; }
+        /* Hero Section */
+        .hero { padding: 80px 20px; text-align: center; background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%); }
+        h1 { font-size: 3.5rem; margin-bottom: 1rem; line-height: 1.1; }
+        .tagline { font-size: 1.5rem; color: var(--text); max-width: 800px; margin: 0 auto 2rem; }
         
-        /* Sidebar Form */
-        .sidebar-login { width: 350px; background: white; border-left: 1px solid #e2e8f0; padding: 40px; box-shadow: -4px 0 15px rgba(0,0,0,0.05); }
-        .login-card { position: sticky; top: 40px; }
-        input { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #cbd5e0; border-radius: 6px; box-sizing: border-box; }
-        button { width: 100%; padding: 12px; background: #3182ce; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; }
-        button:hover { background: #2b6cb0; }
+        /* Form & Buttons */
+        .cta-container { display: flex; justify-content: center; gap: 15px; margin-bottom: 40px; flex-wrap: wrap; }
+        .btn { padding: 12px 25px; border-radius: 8px; font-weight: bold; cursor: pointer; text-decoration: none; border: none; }
+        .btn-primary { background: var(--primary); color: white; }
+        .btn-outline { border: 2px solid var(--primary); color: var(--primary); background: transparent; }
 
-        /* Responsive for Phones */
-        @media (max-width: 768px) {
-            body { flex-direction: column; }
-            .sidebar-login { width: 100%; border-left: none; border-top: 1px solid #e2e8f0; }
-            .objective-section { padding: 30px; }
-        }
+        /* Lobby Form (Integrated) */
+        .lobby-card { background: white; padding: 30px; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); max-width: 400px; margin: 0 auto 60px; }
+        .lobby-card input { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #ddd; border-radius: 6px; box-sizing: border-box; }
+
+        /* Feature Boxes */
+        .features { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; padding: 60px 20px; max-width: 1100px; margin: 0 auto; }
+        .box { padding: 30px; background: #fff; border: 1px solid #e2e8f0; border-radius: 12px; text-align: center; transition: transform 0.2s; }
+        .box:hover { transform: translateY(-5px); border-color: var(--primary); }
+        .box h3 { color: var(--primary); margin-bottom: 10px; }
     </style>
 </head>
 <body>
 
-    <div class="objective-section">
-        <h1>Meetra DC</h1>
-        <p class="mission">
-            <strong>Our Objective:</strong> To bridge the gap between DC's digital innovators and local impact. 
-            We are building a real-time directory for the city's most active founders, creators, and community leaders.
-        </p>
-        <p style="color: #718096;">Join the lobby to see who's active in the district right now.</p>
-    </div>
+    <section class="hero">
+        <h1>Stop scrolling, start meeting.</h1>
+        <p class="tagline">The social local platform that turns shared interests into real-world hangouts at verified local spots.</p>
+        
+        <div class="cta-container">
+            <a href="#" class="btn btn-primary">Book a Demo</a>
+            <a href="#" class="btn btn-outline">Business Inquiry</a>
+        </div>
 
-    <aside class="sidebar-login">
-        <div class="login-card">
-            <h3>Join the Lobby</h3>
+        <div class="lobby-card">
+            <h3>Enter the DC Lobby</h3>
             <form id="lobby-form">
                 <input type="text" placeholder="Your Name" required>
-                <input type="text" placeholder="What are you building?" required>
-                <button type="submit">Broadcast My Presence</button>
+                <input type="text" placeholder="Interest (e.g. Tech, Coffee, Chess)" required>
+                <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 10px;">Broadcast My Presence</button>
             </form>
         </div>
-    </aside>
+    </section>
+
+    <section class="features">
+        <div class="box">
+            <h3>Instant Matchmaking</h3>
+            <p>Connect with people nearby who share your exact interests in real-time.</p>
+        </div>
+        <div class="box">
+            <h3>Hyperlocal Marketing</h3>
+            <p>Discover verified local spots and exclusive offers tailored to your group.</p>
+        </div>
+        <div class="box">
+            <h3>Safe Connections</h3>
+            <p>Verified venues and community moderation ensure a secure environment for all.</p>
+        </div>
+    </section>
 
 </body>
 </html>
