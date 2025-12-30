@@ -3,154 +3,51 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Meetra | DC Social Discovery</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-</head>
-<body class="bg-slate-50 font-sans text-slate-900 pb-20">
-
-    <div class="max-w-md mx-auto p-6">
-        <header class="text-center mb-8">
-            <h1 class="text-5xl font-black text-indigo-600 italic tracking-tighter mb-1">MEETRA</h1>
-            <div class="flex items-center justify-center gap-2">
-                <p class="text-slate-400 font-bold uppercase text-[9px] tracking-[0.3em]">DC Social Lobby</p>
-                <span id="user-count" class="bg-indigo-100 text-indigo-600 text-[8px] px-2 py-0.5 rounded-full font-black hidden">0 LIVE</span>
-            </div>
-        </header>
-
-        <div id="profile-section" class="bg-white rounded-[2.5rem] p-6 shadow-xl border border-slate-100 mb-10">
-            <div id="auth-area">
-                <h2 class="text-xl font-black mb-4 italic text-center text-slate-800">Set Your Signal</h2>
-                <div class="space-y-3">
-                    <input type="text" id="user-name" placeholder="Name" class="w-full bg-slate-50 p-4 rounded-2xl border-0 outline-none ring-1 ring-slate-100 focus:ring-indigo-500">
-                    
-                    <select id="user-status" class="w-full bg-slate-50 p-4 rounded-2xl border-0 outline-none ring-1 ring-slate-100 focus:ring-indigo-500 text-slate-500 font-bold appearance-none">
-                        <option value="☕ Coffee Meeting">☕ Looking for Coffee</option>
-                        <option value="🍸 Drinks / Social">🍸 Drinks / Social</option>
-                        <option value="💼 Business Networking">💼 Business Networking</option>
-                        <option value="🚶 Just Exploring">🚶 Just Exploring</option>
-                    </select>
-
-                    <input type="text" id="user-interest" placeholder="Interests (e.g. AI, Art, Golf)" class="w-full bg-slate-50 p-4 rounded-2xl border-0 outline-none ring-1 ring-slate-100 focus:ring-indigo-500">
-                    <input type="text" id="user-contact" placeholder="Telegram Link or WhatsApp #" class="w-full bg-slate-50 p-4 rounded-2xl border-0 outline-none ring-1 ring-slate-100 focus:ring-indigo-500">
-                    
-                    <button onclick="joinLobby()" class="w-full bg-indigo-600 text-white font-black py-5 rounded-[2rem] shadow-lg active:scale-95 transition-all uppercase tracking-widest text-xs">Broadcast Presence</button>
-                </div>
-            </div>
-        </div>
-
-        <h3 class="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2 mb-4 px-2">
-            <span class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span> Happening in DC Now
-        </h3>
+    <title>Meetra DC Lobby</title>
+    <style>
+        body { font-family: -apple-system, sans-serif; margin: 0; display: flex; min-height: 100vh; background: #f4f7f6; }
         
-        <div id="global-feed" class="space-y-4 mb-12">
-            </div>
+        /* Main Section */
+        .objective-section { flex: 1; padding: 60px; display: flex; flex-direction: column; justify-content: center; }
+        h1 { font-size: 3rem; color: #1a202c; margin-bottom: 20px; }
+        p.mission { font-size: 1.25rem; color: #4a5568; line-height: 1.6; max-width: 600px; }
+        
+        /* Sidebar Form */
+        .sidebar-login { width: 350px; background: white; border-left: 1px solid #e2e8f0; padding: 40px; box-shadow: -4px 0 15px rgba(0,0,0,0.05); }
+        .login-card { position: sticky; top: 40px; }
+        input { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #cbd5e0; border-radius: 6px; box-sizing: border-box; }
+        button { width: 100%; padding: 12px; background: #3182ce; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; }
+        button:hover { background: #2b6cb0; }
 
-        <div class="bg-indigo-900 rounded-[2rem] p-5 text-white shadow-2xl relative overflow-hidden">
-            <div class="relative z-10">
-                <p class="text-[8px] font-black uppercase tracking-[0.3em] opacity-60 mb-1">Recommended Spot</p>
-                <h4 class="text-xl font-black italic mb-2 leading-none text-white">The Hamilton</h4>
-                <p class="text-[10px] opacity-80 leading-relaxed mb-4">Great central spot for networking. Perfect for coffee or a quick bite.</p>
-                <a href="https://www.thehamiltondc.com/" target="_blank" class="inline-block bg-white text-indigo-900 text-[9px] font-black px-4 py-2 rounded-full uppercase tracking-widest">View Menu</a>
-            </div>
-            <div class="absolute -right-10 -bottom-10 w-32 h-32 bg-indigo-500/20 rounded-full"></div>
-        </div>
+        /* Responsive for Phones */
+        @media (max-width: 768px) {
+            body { flex-direction: column; }
+            .sidebar-login { width: 100%; border-left: none; border-top: 1px solid #e2e8f0; }
+            .objective-section { padding: 30px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="objective-section">
+        <h1>Meetra DC</h1>
+        <p class="mission">
+            <strong>Our Objective:</strong> To bridge the gap between DC's digital innovators and local impact. 
+            We are building a real-time directory for the city's most active founders, creators, and community leaders.
+        </p>
+        <p style="color: #718096;">Join the lobby to see who's active in the district right now.</p>
     </div>
 
-    <script>
-        const supabaseUrl = 'https://ggirvskmmgeegjhstiqe.supabase.co';
-        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdnaXJ2c2ttbWdlZWdqaHN0aXFlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjY5NTUxMjMsImV4cCI6MjA4MjUzMTEyM30.8CSk0hPFxvniwk2FGhZoZWsL92JMNpAs2Ry9nid_dG4';
-        const _supabase = supabase.createClient(supabaseUrl, supabaseKey);
+    <aside class="sidebar-login">
+        <div class="login-card">
+            <h3>Join the Lobby</h3>
+            <form id="lobby-form">
+                <input type="text" placeholder="Your Name" required>
+                <input type="text" placeholder="What are you building?" required>
+                <button type="submit">Broadcast My Presence</button>
+            </form>
+        </div>
+    </aside>
 
-        window.onload = () => {
-            loadGlobalFeed();
-            checkMemory();
-        };
-
-        async function loadGlobalFeed() {
-            const { data, error } = await _supabase.from('profiles').select('*').order('created_at', { ascending: false });
-            if (error) return;
-
-            // Update Live Count
-            const countBadge = document.getElementById('user-count');
-            if (data.length > 0) {
-                countBadge.innerText = `${data.length} LIVE`;
-                countBadge.classList.remove('hidden');
-            }
-
-            const feed = document.getElementById('global-feed');
-            if (data && data.length > 0) {
-                feed.innerHTML = data.map(p => {
-                    const parts = p.vibe ? p.vibe.split('|') : ['☕ Coffee', 'Washington, DC', '#'];
-                    const status = parts[0] || '☕ Available';
-                    const city   = parts[1] || 'Washington, DC';
-                    const link   = parts[2] || '#';
-                    const cleanLink = link.startsWith('http') ? link : 'https://wa.me/' + link.replace(/\D/g,'');
-
-                    return `
-                        <div class="bg-white p-5 rounded-[2.5rem] shadow-md border border-slate-100">
-                            <div class="flex items-center gap-4 mb-3">
-                                <div class="w-12 h-12 bg-indigo-50 rounded-full flex items-center justify-center text-xl font-bold text-indigo-400">
-                                    ${(p.username || 'M').charAt(0).toUpperCase()}
-                                </div>
-                                <div class="flex-1 text-left">
-                                    <div class="font-black text-slate-900 text-lg leading-tight">${p.username}</div>
-                                    <div class="inline-block mt-1 bg-indigo-50 text-indigo-600 text-[9px] font-black px-2 py-0.5 rounded uppercase tracking-tighter italic">
-                                        ${status}
-                                    </div>
-                                </div>
-                                <a href="${cleanLink}" target="_blank" class="bg-indigo-600 text-white text-[10px] font-black px-5 py-2.5 rounded-full uppercase tracking-widest shadow-sm">Chat</a>
-                            </div>
-                            <div class="flex items-center justify-between mt-3 pt-3 border-t border-slate-50">
-                                <div class="text-[10px] font-bold text-slate-400 uppercase tracking-widest text-left">💡 ${p.interest || 'Networking'}</div>
-                                <div class="text-[10px] font-bold text-slate-500 text-right">📍 ${city}</div>
-                            </div>
-                        </div>
-                    `;
-                }).join('');
-            } else {
-                feed.innerHTML = `<div class="text-center py-10 opacity-30 italic">Lobby is quiet... be the first!</div>`;
-                countBadge.classList.add('hidden');
-            }
-        }
-
-        async function joinLobby() {
-            const name = document.getElementById('user-name').value;
-            const status = document.getElementById('user-status').value;
-            const interest = document.getElementById('user-interest').value;
-            const contact = document.getElementById('user-contact').value;
-            if(!name) return alert("Please enter your name!");
-
-            const combinedVibe = `${status}|Washington, DC|${contact}`;
-            const { data, error } = await _supabase.from('profiles').insert([{ username: name, interest: interest, vibe: combinedVibe }]).select();
-
-            if (!error) {
-                localStorage.setItem('m_id', data[0].id);
-                localStorage.setItem('m_name', name);
-                location.reload(); 
-            }
-        }
-
-        async function leaveLobby() {
-            const id = localStorage.getItem('m_id');
-            if (id) await _supabase.from('profiles').delete().eq('id', id);
-            localStorage.clear();
-            location.reload();
-        }
-
-        function checkMemory() {
-            const id = localStorage.getItem('m_id');
-            const name = localStorage.getItem('m_name');
-            if (id) {
-                document.getElementById('auth-area').innerHTML = `
-                    <div class="text-center py-2">
-                        <h2 class="text-2xl font-black text-indigo-600 italic leading-tight">You're Live,<br>${name}</h2>
-                        <p class="text-[9px] text-slate-400 font-black tracking-[0.2em] mb-6 mt-1 uppercase">Broadcast Active in DC</p>
-                        <button onclick="leaveLobby()" class="w-full bg-red-50 text-red-500 font-black py-4 rounded-[1.5rem] text-[10px] uppercase tracking-widest border border-red-100 shadow-sm">End Broadcast</button>
-                    </div>
-                `;
-            }
-        }
-    </script>
 </body>
 </html>
