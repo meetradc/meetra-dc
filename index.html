@@ -6,7 +6,6 @@
 <title>Meetra.to | Stop Scrolling. Start Meeting.</title>
 
 <link rel="icon" href="data:,">
-
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
 
 <style>
@@ -23,7 +22,6 @@ body {
   margin:0;
   font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial;
   color:var(--dark);
-  background:white;
 }
 
 .container {
@@ -52,35 +50,27 @@ header {
 }
 
 h1 {
-  font-size:3.2rem;
-  margin:30px 0 16px;
+  font-size:3rem;
+  margin:28px 0 14px;
 }
 h1 span { color:var(--primary); }
 
 .subhead {
-  font-size:1.2rem;
+  font-size:1.1rem;
   color:var(--muted);
-  max-width:680px;
-  margin:0 auto 32px;
+  max-width:640px;
+  margin:0 auto 28px;
 }
 
-.cta-row {
-  display:flex;
-  justify-content:center;
-}
-
-button {
+.primary {
+  background:var(--primary);
+  color:white;
   padding:14px 26px;
   border-radius:14px;
   border:none;
   font-weight:700;
   cursor:pointer;
   font-size:1rem;
-}
-
-.primary {
-  background:var(--primary);
-  color:white;
 }
 
 /* FEATURES */
@@ -108,6 +98,10 @@ button {
 
 /* JOIN + LOBBY */
 
+#joinSection {
+  display:none;
+}
+
 .card {
   max-width:480px;
   margin:40px auto;
@@ -124,7 +118,11 @@ input {
   margin-bottom:12px;
 }
 
-#lobbyView { display:none; }
+#lobbySection {
+  display:none;
+  max-width:520px;
+  margin:40px auto;
+}
 
 .user {
   display:flex;
@@ -142,14 +140,11 @@ input {
 
 .exit {
   background:#eee;
-  color:#111;
   width:100%;
-  margin-top:12px;
-}
-
-@media(max-width:900px) {
-  .features { grid-template-columns:1fr; }
-  h1 { font-size:2.4rem; }
+  padding:12px;
+  border:none;
+  border-radius:12px;
+  margin-top:10px;
 }
 </style>
 </head>
@@ -162,43 +157,41 @@ input {
 
   <h1>Stop scrolling. <span>Start meeting.</span></h1>
   <p class="subhead">
-    Turn shared interests into real-world hangouts at verified local spots — in real time.
+    Turn shared interests into real-world hangouts at verified local spots — live.
   </p>
 
-  <div class="cta-row">
-    <button class="primary" onclick="scrollToJoin()">Enter the DC Lobby</button>
-  </div>
+  <button class="primary" onclick="showJoin()">Enter the DC Lobby</button>
 </header>
 
 <section class="container features">
   <div class="feature">
     <img src="https://images.unsplash.com/photo-1521737604893-d14cc237f11d">
     <h3>Instant Matching</h3>
-    <p>Meet people nearby who want the same thing.</p>
+    <p>See who nearby wants to meet right now.</p>
   </div>
 
   <div class="feature">
     <img src="https://images.unsplash.com/photo-1559339352-11d035aa65de">
     <h3>Real Places</h3>
-    <p>All meetups happen at verified venues.</p>
+    <p>Meetups happen at verified public venues.</p>
   </div>
 
   <div class="feature">
     <img src="https://images.unsplash.com/photo-1549923746-c502d488b3ea">
     <h3>Safe by Design</h3>
-    <p>Public-first, time-bound interactions.</p>
+    <p>Public, time-limited, group-first interactions.</p>
   </div>
 </section>
 
 <section class="container" id="joinSection">
   <div class="card">
-    <input id="usernameInput" placeholder="Your name">
+    <input id="nameInput" placeholder="Your name">
     <input id="interestInput" placeholder="Interest (Coffee, Dog walk)">
     <button class="primary" style="width:100%" onclick="enterLobby()">Enter the DC Lobby</button>
   </div>
 </section>
 
-<section class="container" id="lobbyView">
+<section id="lobbySection">
   <div id="userList"></div>
   <button class="exit" onclick="exitLobby()">Exit Lobby</button>
 </section>
@@ -209,34 +202,37 @@ const supabaseClient = supabase.createClient(
   'sb_publishable_2iQ5bRLoZa9rlmk2m67tMw_5cgYW5H9'
 );
 
-let SESSION_ID = crypto.randomUUID();
+const SESSION_ID = crypto.randomUUID();
 let CURRENT = {};
 let poller;
 
-function scrollToJoin() {
-  document.getElementById('joinSection').scrollIntoView({ behavior:'smooth' });
+/* Reveal join form */
+function showJoin() {
+  document.getElementById('joinSection').style.display = 'block';
 }
 
+/* Enter lobby */
 async function enterLobby() {
-  const name = usernameInput.value.trim();
+  const username = nameInput.value.trim();
   const interest = interestInput.value.trim().toLowerCase();
 
-  if (!name || !interest) {
+  if (!username || !interest) {
     alert('Please enter name and interest');
     return;
   }
 
-  CURRENT = { username:name, interest, session_id:SESSION_ID };
+  CURRENT = { username, interest, session_id: SESSION_ID };
 
   await supabaseClient.from('profiles').insert([CURRENT]);
 
-  joinSection.style.display = 'none';
-  lobbyView.style.display = 'block';
+  document.getElementById('joinSection').style.display = 'none';
+  document.getElementById('lobbySection').style.display = 'block';
 
-  loadLobby();
-  poller = setInterval(loadLobby, 5000);
+  await loadLobby();
+  poller = setInterval(loadLobby, 4000);
 }
 
+/* Load lobby */
 async function loadLobby() {
   const { data } = await supabaseClient
     .from('profiles')
@@ -252,12 +248,10 @@ async function loadLobby() {
   });
 }
 
+/* Exit lobby */
 async function exitLobby() {
   clearInterval(poller);
-  await supabaseClient
-    .from('profiles')
-    .delete()
-    .eq('session_id', SESSION_ID);
+  await supabaseClient.from('profiles').delete().eq('session_id', SESSION_ID);
   location.reload();
 }
 </script>
