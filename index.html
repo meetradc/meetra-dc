@@ -2,341 +2,180 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Meetra.to | Stop Scrolling. Start Meeting.</title>
+<title>Meetra.to</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
 <link rel="icon" href="data:,">
-
-<!-- Supabase UMD -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
 
 <style>
-:root {
-  --primary:#3259e8;
-  --dark:#0f172a;
-  --muted:#64748b;
-  --border:#e5e7eb;
-}
-
-* { box-sizing:border-box; }
-
-body {
-  margin:0;
-  font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial;
-  color:var(--dark);
-  background:white;
-}
-
-.container {
-  max-width:1200px;
-  margin:auto;
-  padding:32px 24px;
-}
-
-/* HEADER */
-.header {
-  text-align:center;
-  padding:48px 0 24px;
-}
-.logo {
-  font-size:2.6rem;
-  font-weight:900;
-}
-.logo span { color:var(--primary); }
-.tagline {
-  color:var(--muted);
-  margin-top:4px;
-}
-
-/* HERO */
-h1 {
-  font-size:3rem;
-  margin:24px 0 12px;
-}
-h1 span { color:var(--primary); }
-
-.subhead {
-  font-size:1.1rem;
-  color:var(--muted);
-  max-width:680px;
-  margin:0 auto 32px;
-}
-
-/* FEATURES */
-.features {
-  display:grid;
-  grid-template-columns:repeat(3,1fr);
-  gap:24px;
-  margin:32px 0 48px;
-}
-.feature {
-  border:1px solid var(--border);
-  border-radius:20px;
-  padding:20px;
-}
-.feature img {
-  width:100%;
-  height:160px;
-  object-fit:cover;
-  border-radius:14px;
-  margin-bottom:14px;
-}
-.feature h3 { margin:0 0 6px; }
-.feature p {
-  margin:0;
-  color:var(--muted);
-  font-size:.95rem;
-}
-
-/* JOIN + LOBBY */
-.card {
-  max-width:460px;
-  margin:0 auto;
-  border:1px solid var(--border);
-  border-radius:22px;
-  padding:28px;
-}
-
-input {
-  width:100%;
-  padding:14px;
-  border-radius:12px;
-  border:1px solid var(--border);
-  margin-bottom:12px;
-}
-
-button {
-  width:100%;
-  padding:14px;
-  border-radius:14px;
-  border:none;
-  font-weight:700;
-  cursor:pointer;
-  background:var(--primary);
-  color:white;
-}
-
-#lobby {
-  display:none;
-  max-width:520px;
-  margin:24px auto 0;
-}
+body { font-family:system-ui,Arial; margin:0; color:#0f172a; }
+.container { max-width:1000px; margin:auto; padding:24px; }
 
 .user {
   display:flex;
   justify-content:space-between;
   align-items:center;
   padding:12px;
+  border:1px solid #e5e7eb;
   border-radius:12px;
-  border:1px solid var(--border);
-  margin-bottom:10px;
+  margin-bottom:8px;
 }
-.match {
-  border:2px solid var(--primary);
-  background:#f0f4ff;
-}
+.match { border:2px solid #3259e8; background:#f0f4ff; }
 
-.meet-btn {
+button {
   padding:6px 10px;
   border-radius:8px;
   border:none;
-  background:var(--primary);
+  background:#3259e8;
   color:white;
-  font-size:.8rem;
   cursor:pointer;
 }
 
-/* VENUES */
+.pending { background:#999; }
+.confirm { background:#16a34a; }
+
 .venue {
   display:flex;
   gap:10px;
-  border:1px solid var(--border);
-  border-radius:12px;
+  border:1px solid #e5e7eb;
   padding:10px;
-  margin-top:10px;
-}
-.venue img {
-  width:80px;
-  height:80px;
-  object-fit:cover;
-  border-radius:8px;
-}
-
-.exit {
-  background:#eee;
-  color:#111;
-  margin-top:12px;
-}
-
-@media(max-width:900px) {
-  .features { grid-template-columns:1fr; }
-  h1 { font-size:2.3rem; }
+  border-radius:10px;
+  margin-top:8px;
 }
 </style>
 </head>
 
 <body>
-
-<div class="header container">
-  <div class="logo">Meetra<span>.to</span></div>
-  <div class="tagline">meet • real • now</div>
-
-  <h1>Stop scrolling. <span>Start meeting.</span></h1>
-  <p class="subhead">
-    Meet people with shared interests at real places — right now.
-  </p>
-</div>
-
-<div class="container features">
-  <div class="feature">
-    <img src="https://images.unsplash.com/photo-1521737604893-d14cc237f11d">
-    <h3>Meet Instantly</h3>
-    <p>Connect with people nearby who want to meet now.</p>
-  </div>
-
-  <div class="feature">
-    <img src="https://images.unsplash.com/photo-1559339352-11d035aa65de">
-    <h3>Real Places</h3>
-    <p>Meet at verified, public venues.</p>
-  </div>
-
-  <div class="feature">
-    <img src="https://images.unsplash.com/photo-1549923746-c502d488b3ea">
-    <h3>Safe, Right Now</h3>
-    <p>Public-first, real-world context from the start.</p>
-  </div>
-</div>
-
 <div class="container">
-  <!-- JOIN -->
-  <div class="card" id="joinCard">
-    <input id="usernameInput" placeholder="Your name">
-    <input id="interestInput" placeholder="Interest (coffee, dog walk, golf)">
-    <button onclick="joinLobby()">Enter the DC Lobby</button>
-  </div>
 
-  <!-- LOBBY -->
-  <div id="lobby">
-    <h3>People live now</h3>
-    <div id="userList"></div>
+<h2>DC Lobby</h2>
 
-    <h3>Venues</h3>
+<div id="join">
+  <input id="username" placeholder="Your name"><br><br>
+  <input id="interest" placeholder="Interest"><br><br>
+  <button onclick="join()">Join</button>
+</div>
+
+<div id="lobby" style="display:none">
+  <h3>People</h3>
+  <div id="users"></div>
+
+  <div id="venues" style="display:none">
+    <h3>Confirmed Venues</h3>
     <div id="venueList"></div>
-
-    <button class="exit" onclick="exitLobby()">Exit Lobby</button>
   </div>
+</div>
+
 </div>
 
 <script>
-/* ---------- SUPABASE ---------- */
 const supabaseClient = supabase.createClient(
   'https://ggirvskmmgeegjhstiqe.supabase.co',
   'sb_publishable_2iQ5bRLoZa9rlmk2m67tMw_5cgYW5H9'
 );
 
-let MY_ID = null;
-let MY_INTEREST = null;
-let MY_USERNAME = null;
-let poller = null;
+let MY_ID, MY_INTEREST;
+let poller;
 
-/* ---------- JOIN ---------- */
-async function joinLobby() {
-  const username = usernameInput.value.trim();
-  const interest = interestInput.value.trim().toLowerCase();
+/* JOIN */
+async function join() {
+  const u = username.value.trim();
+  const i = interest.value.trim().toLowerCase();
+  if (!u || !i) return alert('Missing fields');
 
-  if (!username || !interest) {
-    alert('Please enter name and interest');
-    return;
-  }
-
-  const { data, error } = await supabaseClient
+  const { data } = await supabaseClient
     .from('profiles')
-    .insert([{ username, interest }])
+    .insert([{ username:u, interest:i }])
     .select()
     .single();
 
-  if (error) {
-    alert(error.message);
-    return;
-  }
-
   MY_ID = data.id;
   MY_INTEREST = data.interest;
-  MY_USERNAME = username;
 
-  joinCard.style.display = 'none';
+  join.style.display = 'none';
   lobby.style.display = 'block';
 
-  await loadLobby();
-  poller = setInterval(loadLobby, 4000);
+  load();
+  poller = setInterval(load, 4000);
 }
 
-/* ---------- LOAD LOBBY ---------- */
-async function loadLobby() {
+/* LOAD */
+async function load() {
   const { data: people } = await supabaseClient
     .from('profiles')
-    .select('id, username, interest')
-    .order('created_at', { ascending:false });
+    .select('id, username, interest');
 
-  userList.innerHTML = '';
+  const { data: requests } = await supabaseClient
+    .from('meet_requests')
+    .select('*');
+
+  users.innerHTML = '';
 
   people.forEach(p => {
-    const isMe = p.id === MY_ID;
+    if (p.id === MY_ID) return;
+
     const isMatch = p.interest === MY_INTEREST;
+    if (!isMatch) return;
+
+    const sent = requests.find(r => r.requester_id === MY_ID && r.target_id === p.id);
+    const received = requests.find(r => r.requester_id === p.id && r.target_id === MY_ID);
 
     const div = document.createElement('div');
-    div.className = 'user' + (isMatch ? ' match' : '');
+    div.className = 'user match';
 
     let action = '';
-    if (isMatch && !isMe) {
-      action = `<button class="meet-btn"
-                        onclick="proposeMeet('${p.username}')">
-                  Let’s Meet
-                </button>`;
+    if (sent && received) {
+      action = '<span style="color:green;font-weight:700">Confirmed</span>';
+      showVenues();
+    } else if (received) {
+      action = `<button class="confirm" onclick="confirm(${p.id})">Confirm Meet</button>`;
+    } else if (sent) {
+      action = `<button class="pending" disabled>Request Sent</button>`;
+    } else {
+      action = `<button onclick="request(${p.id})">Let’s Meet</button>`;
     }
 
-    div.innerHTML = `
-      <strong>${p.username}</strong>
-      <span>${p.interest}</span>
-      ${action}
-    `;
-
-    userList.appendChild(div);
+    div.innerHTML = `<strong>${p.username}</strong>${action}`;
+    users.appendChild(div);
   });
+}
 
-  const { data: venues } = await supabaseClient
+/* REQUEST */
+async function request(targetId) {
+  await supabaseClient.from('meet_requests').insert([{
+    requester_id: MY_ID,
+    target_id: targetId,
+    interest: MY_INTEREST
+  }]);
+  load();
+}
+
+/* CONFIRM */
+async function confirm(targetId) {
+  await supabaseClient.from('meet_requests').insert([{
+    requester_id: MY_ID,
+    target_id: targetId,
+    interest: MY_INTEREST
+  }]);
+  load();
+}
+
+/* VENUES */
+async function showVenues() {
+  venues.style.display = 'block';
+
+  const { data } = await supabaseClient
     .from('venues')
-    .select('name, address, image_url');
+    .select('name,address,image_url');
 
   venueList.innerHTML = '';
-  venues.forEach(v => {
-    const name = v.name.toLowerCase();
-    if (name.includes('dog') && MY_INTEREST !== 'dog walk') return;
-
-    const div = document.createElement('div');
-    div.className = 'venue';
-    div.innerHTML = `
-      <img src="${v.image_url}">
-      <div>
-        <strong>${v.name}</strong><br>
-        <small>${v.address}</small>
-      </div>`;
-    venueList.appendChild(div);
+  data.forEach(v => {
+    const d = document.createElement('div');
+    d.className = 'venue';
+    d.innerHTML = `<strong>${v.name}</strong><br>${v.address}`;
+    venueList.appendChild(d);
   });
-}
-
-/* ---------- LET'S MEET ---------- */
-function proposeMeet(targetUsername) {
-  alert(
-    `You asked ${targetUsername} to meet.\n\nNext step: choose a public venue.`
-  );
-}
-
-/* ---------- EXIT ---------- */
-async function exitLobby() {
-  clearInterval(poller);
-  await supabaseClient.from('profiles').delete().eq('id', MY_ID);
-  location.reload();
 }
 </script>
 
