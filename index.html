@@ -236,6 +236,7 @@ const supabaseClient = supabase.createClient(
 
 let MY_ID = null;
 let MY_INTEREST = null;
+let MY_USERNAME = null;
 let poller = null;
 
 /* ---------- JOIN ---------- */
@@ -261,6 +262,7 @@ async function joinLobby() {
 
   MY_ID = data.id;
   MY_INTEREST = data.interest;
+  MY_USERNAME = username;
 
   joinCard.style.display = 'none';
   lobby.style.display = 'block';
@@ -324,8 +326,10 @@ async function loadLobby() {
 }
 
 /* ---------- LET'S MEET ---------- */
-function proposeMeet(username) {
-  alert(`${username} has been notified that you'd like to meet.\n\nSuggested next step: choose a public venue.`);
+function proposeMeet(targetUsername) {
+  alert(
+    `You asked ${targetUsername} to meet.\n\nNext step: choose a public venue.`
+  );
 }
 
 /* ---------- EXIT ---------- */
