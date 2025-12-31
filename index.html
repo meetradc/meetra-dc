@@ -1,9 +1,11 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Meetra.to | Meet People Where Life Happens</title>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Meetra.to | Meet People at Real Venues</title>
+
+<!-- Supabase CDN -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <style>
@@ -161,8 +163,8 @@ button {
   <div>
     <h1>Meet People With<br><span>Your Interests</span></h1>
     <p>
-      Join live interest tables and meet nearby people at real restaurants,
-      cafés, and venues—no endless messaging.
+      Find people who share your interests and meet them at real cafés,
+      restaurants, and venues nearby.
     </p>
 
     <div class="section-title" id="venue-title" style="display:none;">
@@ -176,9 +178,9 @@ button {
     <h3>Join a Live Interest Table</h3>
 
     <form id="form">
-      <input id="name" placeholder="Your name" required>
-      <input id="interest" placeholder="Interest (e.g. Chess, Startups)" required>
-      <button>Enter Lobby</button>
+      <input id="name" placeholder="Your name" required />
+      <input id="interest" placeholder="Interest (e.g. Chess, Tech)" required />
+      <button type="submit">Enter Lobby</button>
     </form>
 
     <div class="section-title">People Available Now</div>
@@ -189,43 +191,77 @@ button {
 </div>
 
 <script>
-const supabase = supabaseJs.createClient(
-  'https://ggirvskmmgeegjhstiqe.supabase.co',
-  'YOUR_PUBLIC_ANON_KEY'
+/* ============================
+   SUPABASE CONFIG (WORKING)
+============================ */
+const SUPABASE_URL = 'https://ggirvskmmgeegjhstiqe.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_2iQ5bRLoZa9rlmk2m67tMw_5cgYW5H9';
+
+const _supabase = supabase.createClient(
+  SUPABASE_URL,
+  SUPABASE_KEY
 );
 
+/* ============================
+   ELEMENTS
+============================ */
 const lobby = document.getElementById('lobby');
 const venues = document.getElementById('venues');
 const venueTitle = document.getElementById('venue-title');
+const form = document.getElementById('form');
 
-async function loadLobby(myInterest="") {
-  const { data } = await supabase.from('profiles')
+/* ============================
+   LOAD LOBBY
+============================ */
+async function loadLobby(myInterest = "") {
+  const { data, error } = await _supabase
+    .from('profiles')
     .select('*')
-    .order('created_at',{ascending:false});
+    .order('created_at', { ascending: false });
 
-  lobby.innerHTML = data.map(p=>{
-    const match = myInterest &&
+  if (error) {
+    console.error('Lobby error:', error);
+    return;
+  }
+
+  lobby.innerHTML = data.map(p => {
+    const match =
+      myInterest &&
       p.interest.toLowerCase().includes(myInterest.toLowerCase());
+
     return `
-      <div class="attendee ${match?'match':''}">
+      <div class="attendee ${match ? 'match' : ''}">
         <div>
           <strong>${p.username}</strong><br>
           <small>${p.interest}</small>
         </div>
-        ${match?'<div class="match-badge">MATCH</div>':''}
-      </div>`;
+        ${match ? '<div class="match-badge">MATCH</div>' : ''}
+      </div>
+    `;
   }).join('');
 
-  if(myInterest) loadVenues();
+  if (myInterest) loadVenues();
 }
 
+/* ============================
+   LOAD VENUES
+============================ */
 async function loadVenues() {
-  const { data } = await supabase.from('venues').select('*').limit(4);
-  if(!data) return;
-  venueTitle.style.display='block';
-  venues.innerHTML = data.map(v=>`
+  const { data, error } = await _supabase
+    .from('venues')
+    .select('*')
+    .limit(4);
+
+  if (error) {
+    console.error('Venue error:', error);
+    return;
+  }
+
+  venueTitle.style.display = 'block';
+
+  venues.innerHTML = data.map(v => `
     <div class="venue">
-      <img src="${v.image_url}" onerror="this.src='https://via.placeholder.com/300'">
+      <img src="${v.image_url || 'https://via.placeholder.com/300'}">
       <div>
         <strong>${v.name}</strong><br>
         <small>${v.address}</small>
@@ -234,15 +270,33 @@ async function loadVenues() {
   `).join('');
 }
 
-document.getElementById('form').onsubmit = async e=>{
+/* ============================
+   FORM SUBMIT
+============================ */
+form.addEventListener('submit', async (e) => {
   e.preventDefault();
-  const name = name.value;
-  const interest = interest.value;
-  await supabase.from('profiles').insert([{username:name,interest}]);
-  loadLobby(interest);
-  e.target.reset();
-};
 
+  const username = document.getElementById('name').value.trim();
+  const interest = document.getElementById('interest').value.trim();
+
+  if (!username || !interest) return;
+
+  const { error } = await _supabase
+    .from('profiles')
+    .insert([{ username, interest }]);
+
+  if (error) {
+    console.error('Insert error:', error);
+    return;
+  }
+
+  form.reset();
+  loadLobby(interest);
+});
+
+/* ============================
+   INIT
+============================ */
 loadLobby();
 </script>
 
