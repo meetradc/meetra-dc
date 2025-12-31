@@ -8,51 +8,156 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <style>
-body { font-family: system-ui; margin:0; background:#fff; color:#111 }
-.container { max-width:1100px; margin:auto; padding:24px }
-button { padding:10px 14px; border-radius:10px; border:none; cursor:pointer }
-input { width:100%; padding:12px; margin-bottom:10px; border-radius:10px; border:1px solid #ddd }
-.panel { border:1px solid #eee; border-radius:16px; padding:20px; margin-bottom:20px }
-.attendee { display:flex; justify-content:space-between; margin-bottom:8px }
-.match { color:#3259e8; font-weight:700 }
-#chat { max-height:200px; overflow:auto; border:1px solid #eee; padding:10px; margin-bottom:10px }
-.venue { border:1px solid #eee; border-radius:12px; margin-bottom:10px }
-.venue img { width:100%; height:120px; object-fit:cover }
-.exit { background:#eee; margin-top:10px }
+:root {
+  --primary:#3259e8;
+  --dark:#111;
+  --muted:#666;
+  --bg:#f8fafc;
+}
+
+body {
+  margin:0;
+  font-family:system-ui,-apple-system,Segoe UI,Roboto;
+  background:white;
+  color:var(--dark);
+}
+
+.container {
+  max-width:1100px;
+  margin:auto;
+  padding:24px;
+}
+
+.logo {
+  font-size:2rem;
+  font-weight:900;
+}
+.logo span { color:var(--primary); }
+
+.landing {
+  text-align:center;
+  padding:80px 20px;
+}
+
+.landing p {
+  font-size:1.2rem;
+  color:var(--muted);
+  margin-bottom:30px;
+}
+
+.panel {
+  border:1px solid #eee;
+  border-radius:18px;
+  padding:22px;
+  margin-bottom:20px;
+  background:white;
+}
+
+input {
+  width:100%;
+  padding:14px;
+  border-radius:12px;
+  border:1px solid #ddd;
+  margin-bottom:12px;
+}
+
+button {
+  padding:12px 16px;
+  border-radius:12px;
+  border:none;
+  background:var(--primary);
+  color:white;
+  font-weight:700;
+  cursor:pointer;
+}
+
+.secondary {
+  background:#eee;
+  color:#111;
+}
+
+.attendee {
+  display:flex;
+  justify-content:space-between;
+  margin-bottom:8px;
+}
+
+.match { color:var(--primary); font-weight:800 }
+
+#chat {
+  border:1px solid #eee;
+  border-radius:12px;
+  padding:10px;
+  height:180px;
+  overflow:auto;
+  margin-bottom:10px;
+  background:var(--bg);
+}
+
+.venue {
+  border:1px solid #eee;
+  border-radius:14px;
+  margin-bottom:14px;
+  overflow:hidden;
+}
+
+.venue img {
+  width:100%;
+  height:120px;
+  object-fit:cover;
+}
+
+.venue div {
+  padding:10px;
+}
+
+.locked {
+  opacity:.4;
+  pointer-events:none;
+}
+
+.exit {
+  margin-top:10px;
+}
 </style>
 </head>
 
 <body>
 <div class="container">
 
-<h1>Meetra</h1>
+<!-- LANDING -->
+<div class="landing" id="landing">
+  <div class="logo">Meetra<span>.to</span></div>
+  <p>Meet people with shared interests — in real places.</p>
 
-<div class="panel" id="join">
-  <input id="name" placeholder="Your name">
-  <input id="interest" placeholder="Interest (Chess, Tech, Food)">
-  <button onclick="join()">Join</button>
+  <div class="panel" style="max-width:420px;margin:auto">
+    <input id="name" placeholder="Your name">
+    <input id="interest" placeholder="Interest (dog walk, chess, tech)">
+    <button onclick="join()">Join</button>
+  </div>
 </div>
 
+<!-- APP -->
 <div id="app" style="display:none">
 
 <div class="panel">
-  <strong>People here now</strong>
+  <strong>People here for <span id="interestLabel"></span></strong>
   <div id="lobby"></div>
 </div>
 
 <div class="panel">
   <strong>Group Chat</strong>
   <div id="chat"></div>
-  <input id="msg" placeholder="Say something">
+  <input id="msg" placeholder="Say something…">
   <button onclick="sendMessage()">Send</button>
 </div>
 
 <div class="panel">
-  <strong>Choose a venue</strong>
+  <strong>Pick a place to meet</strong>
   <div id="venues"></div>
 </div>
 
-<button class="exit" onclick="exit()">Exit</button>
+<button class="secondary exit" onclick="exit()">Exit</button>
 
 </div>
 </div>
@@ -67,103 +172,7 @@ let USER = {};
 
 async function join() {
   USER.username = name.value.trim();
-  USER.interest = interest.value.trim();
+  USER.interest = interest.value.trim().toLowerCase();
   if(!USER.username || !USER.interest) return;
 
-  await supabase.from('profiles').insert(USER);
-  document.getElementById('join').style.display='none';
-  document.getElementById('app').style.display='block';
-
-  loadLobby();
-  loadChat();
-  loadVenues();
-  subscribeChat();
-  expirePresence();
-}
-
-async function loadLobby() {
-  const { data } = await supabase
-    .from('profiles')
-    .select('*')
-    .eq('interest', USER.interest);
-
-  lobby.innerHTML = data.map(p =>
-    `<div class="attendee">
-      ${p.username}
-      <span class="match">MATCH</span>
-    </div>`
-  ).join('');
-}
-
-async function loadChat() {
-  const { data } = await supabase
-    .from('interest_messages')
-    .select('*')
-    .eq('interest', USER.interest)
-    .order('created_at');
-
-  chat.innerHTML = data.map(m =>
-    `<div><strong>${m.username}:</strong> ${m.message}</div>`
-  ).join('');
-  chat.scrollTop = chat.scrollHeight;
-}
-
-async function sendMessage() {
-  if(!msg.value) return;
-  await supabase.from('interest_messages').insert({
-    interest: USER.interest,
-    username: USER.username,
-    message: msg.value
-  });
-  msg.value='';
-}
-
-function subscribeChat() {
-  supabase.channel('chat')
-    .on('postgres_changes',
-      { event:'INSERT', table:'interest_messages' },
-      payload => {
-        if(payload.new.interest === USER.interest) loadChat();
-      }
-    ).subscribe();
-}
-
-async function loadVenues() {
-  const { data } = await supabase.from('venues').select('*');
-  venues.innerHTML = data.map(v =>
-    `<div class="venue">
-      <img src="${v.image_url}">
-      <div>
-        <strong>${v.name}</strong><br>
-        <small>${v.address}</small><br>
-        <button onclick="vote('${v.id}')">Meet Here</button>
-      </div>
-    </div>`
-  ).join('');
-}
-
-async function vote(venue_id) {
-  await supabase.from('meetup_votes').insert({
-    interest: USER.interest,
-    venue_id,
-    username: USER.username
-  });
-  alert('Vote recorded');
-}
-
-async function exit() {
-  await supabase.from('profiles').delete().match({
-    username: USER.username,
-    interest: USER.interest
-  });
-  location.reload();
-}
-
-/* Auto-expire after 60 minutes */
-function expirePresence() {
-  setTimeout(exit, 60 * 60 * 1000);
-}
-</script>
-
-</body>
-</html>
+  await supabase.fro
