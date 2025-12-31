@@ -9,72 +9,34 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
 
 <style>
-body {
-  font-family: system-ui, Arial;
-  background: #fff;
-  margin: 0;
-  color: #0f172a;
-}
-.container {
-  max-width: 900px;
-  margin: auto;
-  padding: 24px;
-}
-h1 span { color: #3259e8; }
+body { font-family: system-ui, Arial; margin:0; color:#0f172a; }
+.container { max-width: 900px; margin:auto; padding:24px; }
 
-.card {
-  border: 1px solid #e5e7eb;
-  border-radius: 16px;
-  padding: 20px;
-  margin-bottom: 24px;
-}
+.card { border:1px solid #e5e7eb; border-radius:16px; padding:20px; margin-bottom:24px; }
 
 input {
-  width: 100%;
-  padding: 12px;
-  margin-bottom: 10px;
-  border-radius: 10px;
-  border: 1px solid #e5e7eb;
+  width:100%; padding:12px; margin-bottom:10px;
+  border-radius:10px; border:1px solid #e5e7eb;
 }
 
 button {
-  padding: 8px 12px;
-  border-radius: 8px;
-  border: none;
-  background: #3259e8;
-  color: white;
-  font-weight: 600;
-  cursor: pointer;
+  padding:8px 12px; border-radius:8px; border:none;
+  background:#3259e8; color:white; font-weight:600; cursor:pointer;
 }
 
 .user {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 10px;
-  border-radius: 10px;
-  border: 1px solid #e5e7eb;
-  margin-bottom: 8px;
+  display:flex; justify-content:space-between; align-items:center;
+  padding:10px; border-radius:10px; border:1px solid #e5e7eb; margin-bottom:8px;
 }
+.match { border:2px solid #3259e8; background:#f0f4ff; }
 
-.match {
-  border: 2px solid #3259e8;
-  background: #f0f4ff;
-}
-
-.pending {
-  background: #9ca3af;
-}
-
-.confirm {
-  background: #16a34a;
-}
+.pending { background:#9ca3af; }
+.confirm { background:#16a34a; }
+.locked { background:#065f46; }
 
 .venue {
-  border: 1px solid #e5e7eb;
-  border-radius: 10px;
-  padding: 10px;
-  margin-top: 8px;
+  border:1px solid #e5e7eb; border-radius:10px; padding:10px; margin-top:8px;
+  display:flex; justify-content:space-between; align-items:center;
 }
 </style>
 </head>
@@ -82,7 +44,7 @@ button {
 <body>
 <div class="container">
 
-<h1>Meetra<span>.to</span></h1>
+<h1>Meetra<span style="color:#3259e8">.to</span></h1>
 <p>meet • real • now</p>
 
 <div class="card" id="joinCard">
@@ -92,11 +54,11 @@ button {
 </div>
 
 <div id="lobby" style="display:none">
-  <h3>People with your interest</h3>
+  <h3>Matches</h3>
   <div id="userList"></div>
 
   <div id="venuesSection" style="display:none">
-    <h3>Suggested Public Venues</h3>
+    <h3>Choose a Public Venue</h3>
     <div id="venueList"></div>
   </div>
 </div>
@@ -104,29 +66,26 @@ button {
 </div>
 
 <script>
-/* ---------- SUPABASE ---------- */
 const supabaseClient = supabase.createClient(
   'https://ggirvskmmgeegjhstiqe.supabase.co',
   'sb_publishable_2iQ5bRLoZa9rlmk2m67tMw_5cgYW5H9'
 );
 
-let MY_ID = null;
-let MY_INTEREST = null;
-let poller = null;
+let MY_ID, MY_INTEREST;
+let ACTIVE_MATCH_ID = null;
+let poller;
 
-/* ---------- JOIN ---------- */
+/* JOIN */
 async function joinLobby() {
   const username = usernameInput.value.trim();
   const interest = interestInput.value.trim().toLowerCase();
   if (!username || !interest) return alert('Missing info');
 
-  const { data, error } = await supabaseClient
+  const { data } = await supabaseClient
     .from('profiles')
     .insert([{ username, interest }])
     .select()
     .single();
-
-  if (error) return alert(error.message);
 
   MY_ID = data.id;
   MY_INTEREST = data.interest;
@@ -138,83 +97,82 @@ async function joinLobby() {
   poller = setInterval(loadLobby, 4000);
 }
 
-/* ---------- LOAD LOBBY ---------- */
+/* LOAD LOBBY */
 async function loadLobby() {
-  const { data: people } = await supabaseClient
-    .from('profiles')
-    .select('id, username, interest');
-
-  const { data: requests } = await supabaseClient
-    .from('meet_requests')
-    .select('*');
+  const { data: people } = await supabaseClient.from('profiles').select('*');
+  const { data: requests } = await supabaseClient.from('meet_requests').select('*');
+  const { data: selections } = await supabaseClient.from('venue_selections').select('*');
 
   userList.innerHTML = '';
 
   people.forEach(p => {
-    if (p.id === MY_ID) return;
-    if (p.interest !== MY_INTEREST) return;
+    if (p.id === MY_ID || p.interest !== MY_INTEREST) return;
 
     const sent = requests.find(r => r.requester_id === MY_ID && r.target_id === p.id);
     const received = requests.find(r => r.requester_id === p.id && r.target_id === MY_ID);
 
-    let action = '';
-    let confirmed = false;
+    if (!(sent && received)) return;
 
-    if (sent && received) {
-      action = '<span style="color:#16a34a;font-weight:700">Confirmed</span>';
-      confirmed = true;
-    } else if (received) {
-      action = `<button class="confirm" onclick="confirmMeet(${p.id})">Confirm Meet</button>`;
-    } else if (sent) {
-      action = `<button class="pending" disabled>Request Sent</button>`;
-    } else {
-      action = `<button onclick="sendRequest(${p.id})">Let’s Meet</button>`;
-    }
+    ACTIVE_MATCH_ID = p.id;
+    venuesSection.style.display = 'block';
 
     const div = document.createElement('div');
     div.className = 'user match';
-    div.innerHTML = `<strong>${p.username}</strong>${action}`;
+    div.innerHTML = `<strong>${p.username}</strong> <span style="color:#16a34a">Confirmed</span>`;
     userList.appendChild(div);
 
-    if (confirmed) showVenues();
+    loadVenues(p.id, selections);
   });
 }
 
-/* ---------- REQUEST ---------- */
-async function sendRequest(targetId) {
-  await supabaseClient.from('meet_requests').insert([{
-    requester_id: MY_ID,
-    target_id: targetId,
-    interest: MY_INTEREST
-  }]);
-  loadLobby();
-}
-
-/* ---------- CONFIRM ---------- */
-async function confirmMeet(targetId) {
-  await supabaseClient.from('meet_requests').insert([{
-    requester_id: MY_ID,
-    target_id: targetId,
-    interest: MY_INTEREST
-  }]);
-  loadLobby();
-}
-
-/* ---------- VENUES ---------- */
-async function showVenues() {
-  venuesSection.style.display = 'block';
-
-  const { data } = await supabaseClient
-    .from('venues')
-    .select('name,address');
-
+/* LOAD VENUES */
+async function loadVenues(otherUserId, selections) {
+  const { data: venues } = await supabaseClient.from('venues').select('*');
   venueList.innerHTML = '';
-  data.forEach(v => {
+
+  venues.forEach(v => {
+    const myPick = selections.find(s =>
+      s.user_id === MY_ID &&
+      s.other_user_id === otherUserId &&
+      s.venue_id === v.id
+    );
+
+    const theirPick = selections.find(s =>
+      s.user_id === otherUserId &&
+      s.other_user_id === MY_ID &&
+      s.venue_id === v.id
+    );
+
+    let action = '';
+    let locked = false;
+
+    if (myPick && theirPick) {
+      action = '<span class="locked">Meeting Set</span>';
+      locked = true;
+    } else if (theirPick && !myPick) {
+      action = `<button class="confirm" onclick="selectVenue(${v.id})">Accept</button>`;
+    } else if (myPick) {
+      action = `<span class="pending">Proposed</span>`;
+    } else {
+      action = `<button onclick="selectVenue(${v.id})">Propose Venue</button>`;
+    }
+
     const div = document.createElement('div');
     div.className = 'venue';
-    div.innerHTML = `<strong>${v.name}</strong><br>${v.address}`;
+    div.innerHTML = `<div><strong>${v.name}</strong><br><small>${v.address}</small></div>${action}`;
     venueList.appendChild(div);
   });
+}
+
+/* SELECT VENUE */
+async function selectVenue(venueId) {
+  await supabaseClient.from('venue_selections').insert([{
+    user_id: MY_ID,
+    other_user_id: ACTIVE_MATCH_ID,
+    venue_id: venueId,
+    interest: MY_INTEREST
+  }]);
+  loadLobby();
 }
 </script>
 
