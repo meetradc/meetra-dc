@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Meetra-to | Stop Scrolling, Start Meeting</title>
+    <title>Meetra-to | Social Local Platform</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         :root { --blue: #3259e8; --dark: #1a202c; --gray: #f8f9fa; --spacing: 100px; }
@@ -61,7 +61,7 @@
                 <div id="venue-display">
                     <p style="font-weight: bold; font-size: 0.9rem; margin-bottom: 15px;">Live in the District:</p>
                     <div id="attendee-list">
-                        <p style="color: #999; font-size: 0.85rem;">Connecting to lobby...</p>
+                        <p style="color: #999; font-size: 0.85rem;">Checking for active broadcasts...</p>
                     </div>
                 </div>
             </div>
@@ -115,12 +115,12 @@
                 .select('*')
                 .order('created_at', { ascending: false });
 
-            if (error) { console.error(error.message); return; }
+            if (error) { console.error("Database Error:", error.message); return; }
 
             if (data && data.length > 0) {
                 list.innerHTML = data.map(person => `
                     <div class="attendee">
-                        <strong>${person.username || person.name || 'User'}</strong> is up for ${person.interest || 'anything'}
+                        <strong>${person.username || 'User'}</strong> is up for ${person.interest || 'anything'}
                     </div>
                 `).join('');
             } else {
@@ -135,7 +135,7 @@
 
             const { error } = await _supabase
                 .from('profiles')
-                .insert([{ username: val, interest: intr }]); // USES 'username'
+                .insert([{ username: val, interest: intr }]); 
 
             if (error) {
                 alert("Database Error: " + error.message);
@@ -149,4 +149,3 @@
     </script>
 </body>
 </html>
-
