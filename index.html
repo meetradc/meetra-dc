@@ -1,303 +1,168 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Meetra.to | Meet People at Real Venues</title>
+<meta charset="UTF-8">
+<title>Meetra.to | Meet in Real Life</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
 
-<!-- Supabase CDN -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <style>
-:root {
-  --primary:#3259e8;
-  --dark:#1a202c;
-  --muted:#64748b;
-  --bg:#f8fafc;
-}
-
-body {
-  margin:0;
-  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;
-  color:var(--dark);
-  background:white;
-}
-
-.container {
-  max-width:1200px;
-  margin:auto;
-  padding:0 24px;
-}
-
-header {
-  padding:18px 0;
-  border-bottom:1px solid #eee;
-}
-
-.logo {
-  font-weight:900;
-  font-size:1.5rem;
-}
-.logo span { color:var(--primary); }
-
-.hero {
-  display:grid;
-  grid-template-columns:1.1fr 0.9fr;
-  gap:50px;
-  padding:70px 0;
-}
-
-h1 {
-  font-size:3rem;
-  line-height:1.1;
-  margin-bottom:16px;
-}
-h1 span { color:var(--primary); }
-
-.hero p {
-  font-size:1.1rem;
-  color:var(--muted);
-  max-width:480px;
-}
-
-.panel {
-  background:white;
-  border-radius:22px;
-  padding:32px;
-  border:1px solid #eef2f7;
-  box-shadow:0 15px 45px rgba(0,0,0,.06);
-}
-
-input {
-  width:100%;
-  padding:14px;
-  border-radius:12px;
-  border:1px solid #e2e8f0;
-  margin-bottom:12px;
-  font-size:.95rem;
-}
-
-button {
-  width:100%;
-  padding:16px;
-  border:none;
-  border-radius:14px;
-  background:var(--primary);
-  color:white;
-  font-weight:800;
-  cursor:pointer;
-}
-
-.section-title {
-  font-size:.85rem;
-  letter-spacing:.04em;
-  text-transform:uppercase;
-  color:var(--muted);
-  margin:26px 0 12px;
-}
-
-.attendee {
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  background:var(--bg);
-  border-radius:14px;
-  padding:14px;
-  margin-bottom:10px;
-  border:1px solid #e5e7eb;
-}
-
-.attendee.match {
-  border:2px solid var(--primary);
-  background:#f0f4ff;
-}
-
-.match-badge {
-  color:var(--primary);
-  font-weight:800;
-  font-size:.8rem;
-}
-
-#venues {
-  display:grid;
-  grid-template-columns:repeat(2,1fr);
-  gap:14px;
-  margin-top:20px;
-}
-
-.venue {
-  border-radius:16px;
-  overflow:hidden;
-  border:1px solid #eee;
-}
-
-.venue img {
-  width:100%;
-  height:110px;
-  object-fit:cover;
-}
-
-.venue div {
-  padding:10px;
-  font-size:.85rem;
-}
-
-@media(max-width:900px){
-  .hero{grid-template-columns:1fr}
-}
+body { font-family: system-ui; margin:0; background:#fff; color:#111 }
+.container { max-width:1100px; margin:auto; padding:24px }
+button { padding:10px 14px; border-radius:10px; border:none; cursor:pointer }
+input { width:100%; padding:12px; margin-bottom:10px; border-radius:10px; border:1px solid #ddd }
+.panel { border:1px solid #eee; border-radius:16px; padding:20px; margin-bottom:20px }
+.attendee { display:flex; justify-content:space-between; margin-bottom:8px }
+.match { color:#3259e8; font-weight:700 }
+#chat { max-height:200px; overflow:auto; border:1px solid #eee; padding:10px; margin-bottom:10px }
+.venue { border:1px solid #eee; border-radius:12px; margin-bottom:10px }
+.venue img { width:100%; height:120px; object-fit:cover }
+.exit { background:#eee; margin-top:10px }
 </style>
 </head>
 
 <body>
-
-<header>
-  <div class="container">
-    <div class="logo">Meetra<span>.to</span></div>
-  </div>
-</header>
-
 <div class="container">
-<section class="hero">
 
-  <!-- LEFT -->
-  <div>
-    <h1>Meet People With<br><span>Your Interests</span></h1>
-    <p>
-      Find people who share your interests and meet them at real cafés,
-      restaurants, and venues nearby.
-    </p>
+<h1>Meetra</h1>
 
-    <div class="section-title" id="venue-title" style="display:none;">
-      Suggested Meeting Venues
-    </div>
-    <div id="venues"></div>
-  </div>
+<div class="panel" id="join">
+  <input id="name" placeholder="Your name">
+  <input id="interest" placeholder="Interest (Chess, Tech, Food)">
+  <button onclick="join()">Join</button>
+</div>
 
-  <!-- RIGHT -->
-  <div class="panel">
-    <h3>Join a Live Interest Table</h3>
+<div id="app" style="display:none">
 
-    <form id="form">
-      <input id="name" placeholder="Your name" required />
-      <input id="interest" placeholder="Interest (e.g. Chess, Tech)" required />
-      <button type="submit">Enter Lobby</button>
-    </form>
+<div class="panel">
+  <strong>People here now</strong>
+  <div id="lobby"></div>
+</div>
 
-    <div class="section-title">People Available Now</div>
-    <div id="lobby"></div>
-  </div>
+<div class="panel">
+  <strong>Group Chat</strong>
+  <div id="chat"></div>
+  <input id="msg" placeholder="Say something">
+  <button onclick="sendMessage()">Send</button>
+</div>
 
-</section>
+<div class="panel">
+  <strong>Choose a venue</strong>
+  <div id="venues"></div>
+</div>
+
+<button class="exit" onclick="exit()">Exit</button>
+
+</div>
 </div>
 
 <script>
-/* ============================
-   SUPABASE CONFIG (WORKING)
-============================ */
-const SUPABASE_URL = 'https://ggirvskmmgeegjhstiqe.supabase.co';
-const SUPABASE_KEY = 'sb_publishable_2iQ5bRLoZa9rlmk2m67tMw_5cgYW5H9';
-
-const _supabase = supabase.createClient(
-  SUPABASE_URL,
-  SUPABASE_KEY
+const supabase = window.supabase.createClient(
+  'https://ggirvskmmgeegjhstiqe.supabase.co',
+  'sb_publishable_2iQ5bRLoZa9rlmk2m67tMw_5cgYW5H9'
 );
 
-/* ============================
-   ELEMENTS
-============================ */
-const lobby = document.getElementById('lobby');
-const venues = document.getElementById('venues');
-const venueTitle = document.getElementById('venue-title');
-const form = document.getElementById('form');
+let USER = {};
 
-/* ============================
-   LOAD LOBBY
-============================ */
-async function loadLobby(myInterest = "") {
-  const { data, error } = await _supabase
-    .from('profiles')
-    .select('*')
-    .order('created_at', { ascending: false });
+async function join() {
+  USER.username = name.value.trim();
+  USER.interest = interest.value.trim();
+  if(!USER.username || !USER.interest) return;
 
-  if (error) {
-    console.error('Lobby error:', error);
-    return;
-  }
+  await supabase.from('profiles').insert(USER);
+  document.getElementById('join').style.display='none';
+  document.getElementById('app').style.display='block';
 
-  lobby.innerHTML = data.map(p => {
-    const match =
-      myInterest &&
-      p.interest.toLowerCase().includes(myInterest.toLowerCase());
-
-    return `
-      <div class="attendee ${match ? 'match' : ''}">
-        <div>
-          <strong>${p.username}</strong><br>
-          <small>${p.interest}</small>
-        </div>
-        ${match ? '<div class="match-badge">MATCH</div>' : ''}
-      </div>
-    `;
-  }).join('');
-
-  if (myInterest) loadVenues();
+  loadLobby();
+  loadChat();
+  loadVenues();
+  subscribeChat();
+  expirePresence();
 }
 
-/* ============================
-   LOAD VENUES
-============================ */
-async function loadVenues() {
-  const { data, error } = await _supabase
-    .from('venues')
+async function loadLobby() {
+  const { data } = await supabase
+    .from('profiles')
     .select('*')
-    .limit(4);
+    .eq('interest', USER.interest);
 
-  if (error) {
-    console.error('Venue error:', error);
-    return;
-  }
+  lobby.innerHTML = data.map(p =>
+    `<div class="attendee">
+      ${p.username}
+      <span class="match">MATCH</span>
+    </div>`
+  ).join('');
+}
 
-  venueTitle.style.display = 'block';
+async function loadChat() {
+  const { data } = await supabase
+    .from('interest_messages')
+    .select('*')
+    .eq('interest', USER.interest)
+    .order('created_at');
 
-  venues.innerHTML = data.map(v => `
-    <div class="venue">
-      <img src="${v.image_url || 'https://via.placeholder.com/300'}">
+  chat.innerHTML = data.map(m =>
+    `<div><strong>${m.username}:</strong> ${m.message}</div>`
+  ).join('');
+  chat.scrollTop = chat.scrollHeight;
+}
+
+async function sendMessage() {
+  if(!msg.value) return;
+  await supabase.from('interest_messages').insert({
+    interest: USER.interest,
+    username: USER.username,
+    message: msg.value
+  });
+  msg.value='';
+}
+
+function subscribeChat() {
+  supabase.channel('chat')
+    .on('postgres_changes',
+      { event:'INSERT', table:'interest_messages' },
+      payload => {
+        if(payload.new.interest === USER.interest) loadChat();
+      }
+    ).subscribe();
+}
+
+async function loadVenues() {
+  const { data } = await supabase.from('venues').select('*');
+  venues.innerHTML = data.map(v =>
+    `<div class="venue">
+      <img src="${v.image_url}">
       <div>
         <strong>${v.name}</strong><br>
-        <small>${v.address}</small>
+        <small>${v.address}</small><br>
+        <button onclick="vote('${v.id}')">Meet Here</button>
       </div>
-    </div>
-  `).join('');
+    </div>`
+  ).join('');
 }
 
-/* ============================
-   FORM SUBMIT
-============================ */
-form.addEventListener('submit', async (e) => {
-  e.preventDefault();
+async function vote(venue_id) {
+  await supabase.from('meetup_votes').insert({
+    interest: USER.interest,
+    venue_id,
+    username: USER.username
+  });
+  alert('Vote recorded');
+}
 
-  const username = document.getElementById('name').value.trim();
-  const interest = document.getElementById('interest').value.trim();
+async function exit() {
+  await supabase.from('profiles').delete().match({
+    username: USER.username,
+    interest: USER.interest
+  });
+  location.reload();
+}
 
-  if (!username || !interest) return;
-
-  const { error } = await _supabase
-    .from('profiles')
-    .insert([{ username, interest }]);
-
-  if (error) {
-    console.error('Insert error:', error);
-    return;
-  }
-
-  form.reset();
-  loadLobby(interest);
-});
-
-/* ============================
-   INIT
-============================ */
-loadLobby();
+/* Auto-expire after 60 minutes */
+function expirePresence() {
+  setTimeout(exit, 60 * 60 * 1000);
+}
 </script>
 
 </body>
