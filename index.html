@@ -5,6 +5,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Meetra.to | Stop Scrolling. Start Meeting.</title>
 
+<!-- Silence favicon 404 -->
+<link rel="icon" href="data:,">
+
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <style>
@@ -30,14 +33,17 @@ body {
   padding:40px 24px;
 }
 
+/* ---------- HERO ---------- */
+
 header {
   text-align:center;
-  padding:80px 0 60px;
+  padding:72px 0 40px;
 }
 
 .logo {
   font-size:2.6rem;
   font-weight:900;
+  letter-spacing:-0.02em;
 }
 .logo span { color:var(--primary); }
 
@@ -50,6 +56,7 @@ header {
 h1 {
   font-size:3.2rem;
   margin:30px 0 16px;
+  line-height:1.1;
 }
 h1 span { color:var(--primary); }
 
@@ -57,8 +64,10 @@ h1 span { color:var(--primary); }
   font-size:1.2rem;
   color:var(--muted);
   max-width:680px;
-  margin:0 auto 36px;
+  margin:0 auto 32px;
 }
+
+/* ---------- CTA ---------- */
 
 .cta-row {
   display:flex;
@@ -73,6 +82,7 @@ button {
   border:none;
   font-weight:700;
   cursor:pointer;
+  font-size:1rem;
 }
 
 .primary {
@@ -83,19 +93,23 @@ button {
 .secondary {
   background:white;
   border:1px solid var(--border);
+  color:var(--dark);
 }
+
+/* ---------- FEATURES ---------- */
 
 .features {
   display:grid;
   grid-template-columns:repeat(3,1fr);
   gap:24px;
-  margin:80px 0;
+  margin:36px 0;
 }
 
 .feature {
   border:1px solid var(--border);
   border-radius:20px;
   padding:24px;
+  background:white;
 }
 
 .feature img {
@@ -106,12 +120,37 @@ button {
   margin-bottom:16px;
 }
 
+.feature h3 {
+  margin:0 0 6px;
+  font-size:1.1rem;
+}
+
+.feature p {
+  margin:0;
+  color:var(--muted);
+  font-size:.95rem;
+}
+
+/* ---------- LOBBY ---------- */
+
 .lobby {
   max-width:480px;
-  margin:0 auto 80px;
+  margin:40px auto 80px;
   border:1px solid var(--border);
   border-radius:22px;
   padding:28px;
+  background:white;
+}
+
+.lobby h2 {
+  margin:0 0 8px;
+  text-align:center;
+}
+
+.lobby p {
+  text-align:center;
+  color:var(--muted);
+  margin-bottom:20px;
 }
 
 input {
@@ -120,13 +159,47 @@ input {
   border-radius:12px;
   border:1px solid var(--border);
   margin-bottom:12px;
+  font-size:.95rem;
 }
+
+.helper {
+  font-size:.85rem;
+  color:var(--muted);
+  margin-top:10px;
+  text-align:center;
+}
+
+/* ---------- BUSINESS ---------- */
+
+.business {
+  border-top:1px solid var(--border);
+  padding:60px 0 20px;
+  text-align:center;
+}
+
+.business h2 {
+  margin-bottom:10px;
+}
+
+.business p {
+  color:var(--muted);
+  margin-bottom:20px;
+}
+
+/* ---------- FOOTER ---------- */
 
 footer {
   text-align:center;
-  padding:40px;
+  padding:40px 0;
   font-size:.85rem;
   color:var(--muted);
+}
+
+/* ---------- RESPONSIVE ---------- */
+
+@media(max-width:900px) {
+  .features { grid-template-columns:1fr; }
+  h1 { font-size:2.4rem; }
 }
 </style>
 </head>
@@ -144,7 +217,7 @@ footer {
   </p>
 
   <div class="cta-row">
-    <button class="primary">Enter the DC Lobby</button>
+    <button class="primary" onclick="scrollToLobby()">Enter the DC Lobby</button>
     <button class="secondary">Business Inquiry</button>
   </div>
 </header>
@@ -153,31 +226,53 @@ footer {
   <div class="feature">
     <img src="https://images.unsplash.com/photo-1521737604893-d14cc237f11d">
     <h3>Instant Matching</h3>
-    <p>See who nearby wants to meet — right now.</p>
+    <p>See who nearby wants to grab coffee, walk a dog, or meet — right now.</p>
   </div>
 
   <div class="feature">
     <img src="https://images.unsplash.com/photo-1559339352-11d035aa65de">
-    <h3>Real Places</h3>
-    <p>Meetups happen at verified public venues.</p>
+    <h3>Meet at Real Places</h3>
+    <p>All meetups happen at verified cafés, bars, parks, and venues.</p>
   </div>
 
   <div class="feature">
     <img src="https://images.unsplash.com/photo-1549923746-c502d488b3ea">
     <h3>Safe by Design</h3>
-    <p>Group-first, public, time-limited interactions.</p>
+    <p>Group-first interactions, public locations, and time-limited presence.</p>
   </div>
 </section>
 
-<section class="container lobby">
-  <input placeholder="Your name">
-  <input placeholder="Interest (Coffee, Dog Walk, Chess)">
+<section class="container lobby" id="dc-lobby">
+  <h2>Join the Live DC Lobby</h2>
+  <p>Find people nearby who want to do the same thing.</p>
+
+  <input placeholder="Your name (first name or nickname)">
+  <input placeholder="Interest (Dog walk, Coffee, Chess)">
   <button class="primary" style="width:100%">Broadcast My Presence</button>
+
+  <div class="helper">
+    You’ll appear instantly. Chat and meetups unlock when at least two people match.
+  </div>
+</section>
+
+<section class="container business">
+  <h2>Own a café, bar, or community space?</h2>
+  <p>Meetra helps venues turn quiet hours into real social moments.</p>
+  <button class="secondary">Book a Demo</button>
 </section>
 
 <footer>
   © Meetra.to — Local. Live. Social.
 </footer>
+
+<script>
+function scrollToLobby() {
+  document.getElementById('dc-lobby').scrollIntoView({
+    behavior: 'smooth',
+    block: 'start'
+  });
+}
+</script>
 
 </body>
 </html>
