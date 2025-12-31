@@ -16,7 +16,6 @@
   --dark:#0f172a;
   --muted:#64748b;
   --border:#e5e7eb;
-  --bg:#f8fafc;
 }
 
 * { box-sizing:border-box; }
@@ -74,7 +73,6 @@ h1 span { color:var(--primary); }
   border:1px solid var(--border);
   border-radius:20px;
   padding:20px;
-  background:white;
 }
 .feature img {
   width:100%;
@@ -174,27 +172,27 @@ button {
 
   <h1>Stop scrolling. <span>Start meeting.</span></h1>
   <p class="subhead">
-    Meet people with shared interests at verified local venues — live.
+    Meet people with shared interests at real places — right now.
   </p>
 </div>
 
 <div class="container features">
   <div class="feature">
     <img src="https://images.unsplash.com/photo-1521737604893-d14cc237f11d">
-    <h3>Instant Matching</h3>
-    <p>See who wants the same thing right now.</p>
+    <h3>Meet Instantly</h3>
+    <p>Connect with people nearby who want to meet now.</p>
   </div>
 
   <div class="feature">
     <img src="https://images.unsplash.com/photo-1559339352-11d035aa65de">
     <h3>Real Places</h3>
-    <p>Meet at verified venues.</p>
+    <p>Meet at verified, public venues.</p>
   </div>
 
   <div class="feature">
     <img src="https://images.unsplash.com/photo-1549923746-c502d488b3ea">
-    <h3>Safe by Design</h3>
-    <p>Public, real-world connections.</p>
+    <h3>Safe, Right Now</h3>
+    <p>Public-first, real-world context from the start.</p>
   </div>
 </div>
 
@@ -202,7 +200,7 @@ button {
   <!-- JOIN -->
   <div class="card" id="joinCard">
     <input id="usernameInput" placeholder="Your name">
-    <input id="interestInput" placeholder="Interest (coffee, dog walk)">
+    <input id="interestInput" placeholder="Interest (coffee, dog walk, golf)">
     <button onclick="joinLobby()">Enter the DC Lobby</button>
   </div>
 
@@ -219,7 +217,7 @@ button {
 </div>
 
 <script>
-/* ---------------- SUPABASE INIT ---------------- */
+/* ---------- SUPABASE ---------- */
 const supabaseClient = supabase.createClient(
   'https://ggirvskmmgeegjhstiqe.supabase.co',
   'sb_publishable_2iQ5bRLoZa9rlmk2m67tMw_5cgYW5H9'
@@ -229,7 +227,7 @@ let MY_ID = null;
 let MY_INTEREST = null;
 let poller = null;
 
-/* ---------------- JOIN ---------------- */
+/* ---------- JOIN ---------- */
 async function joinLobby() {
   const username = usernameInput.value.trim();
   const interest = interestInput.value.trim().toLowerCase();
@@ -260,7 +258,7 @@ async function joinLobby() {
   poller = setInterval(loadLobby, 4000);
 }
 
-/* ---------------- LOAD LOBBY ---------------- */
+/* ---------- LOAD LOBBY ---------- */
 async function loadLobby() {
   const { data: people } = await supabaseClient
     .from('profiles')
@@ -277,11 +275,15 @@ async function loadLobby() {
 
   const { data: venues } = await supabaseClient
     .from('venues')
-    .select('name, address, image_url')
-    .limit(3);
+    .select('name, address, image_url');
 
   venueList.innerHTML = '';
   venues.forEach(v => {
+    const name = v.name.toLowerCase();
+
+    // Show dog parks ONLY if interest is dog walk
+    if (name.includes('dog') && MY_INTEREST !== 'dog walk') return;
+
     const div = document.createElement('div');
     div.className = 'venue';
     div.innerHTML = `
@@ -294,7 +296,7 @@ async function loadLobby() {
   });
 }
 
-/* ---------------- EXIT ---------------- */
+/* ---------- EXIT ---------- */
 async function exitLobby() {
   clearInterval(poller);
   await supabaseClient.from('profiles').delete().eq('id', MY_ID);
