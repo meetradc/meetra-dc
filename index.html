@@ -20,23 +20,38 @@ input {
 }
 
 button {
-  padding:8px 12px; border-radius:8px; border:none;
-  background:#3259e8; color:white; font-weight:600; cursor:pointer;
+  padding:8px 12px;
+  border-radius:8px;
+  border:none;
+  background:#3259e8;
+  color:white;
+  font-weight:600;
+  cursor:pointer;
 }
 
 .user {
-  display:flex; justify-content:space-between; align-items:center;
-  padding:10px; border-radius:10px; border:1px solid #e5e7eb; margin-bottom:8px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:10px;
+  border-radius:10px;
+  border:1px solid #e5e7eb;
+  margin-bottom:8px;
 }
-.match { border:2px solid #3259e8; background:#f0f4ff; }
+
+.match {
+  border:2px solid #3259e8;
+  background:#f0f4ff;
+}
 
 .pending { background:#9ca3af; }
 .confirm { background:#16a34a; }
-.locked { background:#065f46; }
 
 .venue {
-  border:1px solid #e5e7eb; border-radius:10px; padding:10px; margin-top:8px;
-  display:flex; justify-content:space-between; align-items:center;
+  border:1px solid #e5e7eb;
+  border-radius:10px;
+  padding:10px;
+  margin-top:8px;
 }
 </style>
 </head>
@@ -58,7 +73,7 @@ button {
   <div id="userList"></div>
 
   <div id="venuesSection" style="display:none">
-    <h3>Choose a Public Venue</h3>
+    <h3>Suggested Public Venues</h3>
     <div id="venueList"></div>
   </div>
 </div>
@@ -72,8 +87,7 @@ const supabaseClient = supabase.createClient(
 );
 
 let MY_ID, MY_INTEREST;
-let ACTIVE_MATCH_ID = null;
-let poller;
+let poller = null;
 
 /* JOIN */
 async function joinLobby() {
@@ -81,11 +95,13 @@ async function joinLobby() {
   const interest = interestInput.value.trim().toLowerCase();
   if (!username || !interest) return alert('Missing info');
 
-  const { data } = await supabaseClient
+  const { data, error } = await supabaseClient
     .from('profiles')
     .insert([{ username, interest }])
     .select()
     .single();
+
+  if (error) return alert(error.message);
 
   MY_ID = data.id;
   MY_INTEREST = data.interest;
@@ -93,86 +109,84 @@ async function joinLobby() {
   joinCard.style.display = 'none';
   lobby.style.display = 'block';
 
-  await loadLobby();
+  loadLobby();
   poller = setInterval(loadLobby, 4000);
 }
 
-/* LOAD LOBBY */
+/* LOAD */
 async function loadLobby() {
-  const { data: people } = await supabaseClient.from('profiles').select('*');
-  const { data: requests } = await supabaseClient.from('meet_requests').select('*');
-  const { data: selections } = await supabaseClient.from('venue_selections').select('*');
+  const { data: people } = await supabaseClient
+    .from('profiles')
+    .select('*');
+
+  const { data: requests } = await supabaseClient
+    .from('meet_requests')
+    .select('*');
 
   userList.innerHTML = '';
 
   people.forEach(p => {
-    if (p.id === MY_ID || p.interest !== MY_INTEREST) return;
+    if (p.id === MY_ID) return;
+    if (p.interest !== MY_INTEREST) return;
 
     const sent = requests.find(r => r.requester_id === MY_ID && r.target_id === p.id);
     const received = requests.find(r => r.requester_id === p.id && r.target_id === MY_ID);
 
-    if (!(sent && received)) return;
-
-    ACTIVE_MATCH_ID = p.id;
-    venuesSection.style.display = 'block';
-
-    const div = document.createElement('div');
-    div.className = 'user match';
-    div.innerHTML = `<strong>${p.username}</strong> <span style="color:#16a34a">Confirmed</span>`;
-    userList.appendChild(div);
-
-    loadVenues(p.id, selections);
-  });
-}
-
-/* LOAD VENUES */
-async function loadVenues(otherUserId, selections) {
-  const { data: venues } = await supabaseClient.from('venues').select('*');
-  venueList.innerHTML = '';
-
-  venues.forEach(v => {
-    const myPick = selections.find(s =>
-      s.user_id === MY_ID &&
-      s.other_user_id === otherUserId &&
-      s.venue_id === v.id
-    );
-
-    const theirPick = selections.find(s =>
-      s.user_id === otherUserId &&
-      s.other_user_id === MY_ID &&
-      s.venue_id === v.id
-    );
-
     let action = '';
-    let locked = false;
 
-    if (myPick && theirPick) {
-      action = '<span class="locked">Meeting Set</span>';
-      locked = true;
-    } else if (theirPick && !myPick) {
-      action = `<button class="confirm" onclick="selectVenue(${v.id})">Accept</button>`;
-    } else if (myPick) {
-      action = `<span class="pending">Proposed</span>`;
+    if (sent && received) {
+      action = '<span style="color:#16a34a;font-weight:700">Confirmed</span>';
+      showVenues();
+    } else if (received) {
+      action = `<button class="confirm" onclick="confirmMeet(${p.id})">Confirm Meet</button>`;
+    } else if (sent) {
+      action = `<button class="pending" disabled>Request Sent</button>`;
     } else {
-      action = `<button onclick="selectVenue(${v.id})">Propose Venue</button>`;
+      action = `<button onclick="sendRequest(${p.id})">Let’s Meet</button>`;
     }
 
     const div = document.createElement('div');
-    div.className = 'venue';
-    div.innerHTML = `<div><strong>${v.name}</strong><br><small>${v.address}</small></div>${action}`;
-    venueList.appendChild(div);
+    div.className = 'user match';
+    div.innerHTML = `<strong>${p.username}</strong>${action}`;
+    userList.appendChild(div);
   });
 }
 
-/* SELECT VENUE */
-async function selectVenue(venueId) {
-  await supabaseClient.from('venue_selections').insert([{
-    user_id: MY_ID,
-    other_user_id: ACTIVE_MATCH_ID,
-    venue_id: venueId,
+/* SEND REQUEST */
+async function sendRequest(targetId) {
+  await supabaseClient.from('meet_requests').insert([{
+    requester_id: MY_ID,
+    target_id: targetId,
     interest: MY_INTEREST
   }]);
   loadLobby();
+}
+
+/* CONFIRM */
+async function confirmMeet(targetId) {
+  await supabaseClient.from('meet_requests').insert([{
+    requester_id: MY_ID,
+    target_id: targetId,
+    interest: MY_INTEREST
+  }]);
+  loadLobby();
+}
+
+/* VENUES */
+async function showVenues() {
+  venuesSection.style.display = 'block';
+
+  const { data } = await supabaseClient
+    .from('venues')
+    .select('name,address');
+
+  venueList.innerHTML = '';
+  data.forEach(v => {
+    const div = document.createElement('div');
+    div.className = 'venue';
+    div.innerHTML = `<strong>${v.name}</strong><br>${v.address}`;
+    venueList.appendChild(div);
+  });
 }
 </script>
 
