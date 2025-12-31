@@ -5,7 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Meetra.to | Stop Scrolling. Start Meeting.</title>
 
-<!-- Silence favicon 404 -->
 <link rel="icon" href="data:,">
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -33,8 +32,7 @@ body {
   padding:40px 24px;
 }
 
-/* ---------- HERO ---------- */
-
+/* HERO */
 header {
   text-align:center;
   padding:72px 0 40px;
@@ -43,7 +41,6 @@ header {
 .logo {
   font-size:2.6rem;
   font-weight:900;
-  letter-spacing:-0.02em;
 }
 .logo span { color:var(--primary); }
 
@@ -67,8 +64,7 @@ h1 span { color:var(--primary); }
   margin:0 auto 32px;
 }
 
-/* ---------- CTA ---------- */
-
+/* CTA */
 .cta-row {
   display:flex;
   gap:14px;
@@ -96,8 +92,7 @@ button {
   color:var(--dark);
 }
 
-/* ---------- FEATURES ---------- */
-
+/* FEATURES */
 .features {
   display:grid;
   grid-template-columns:repeat(3,1fr);
@@ -109,7 +104,6 @@ button {
   border:1px solid var(--border);
   border-radius:20px;
   padding:24px;
-  background:white;
 }
 
 .feature img {
@@ -120,38 +114,22 @@ button {
   margin-bottom:16px;
 }
 
-.feature h3 {
-  margin:0 0 6px;
-  font-size:1.1rem;
-}
-
 .feature p {
-  margin:0;
   color:var(--muted);
   font-size:.95rem;
 }
 
-/* ---------- LOBBY ---------- */
-
+/* LOBBY */
 .lobby {
   max-width:480px;
   margin:40px auto 80px;
   border:1px solid var(--border);
   border-radius:22px;
   padding:28px;
-  background:white;
 }
 
-.lobby h2 {
-  margin:0 0 8px;
-  text-align:center;
-}
-
-.lobby p {
-  text-align:center;
-  color:var(--muted);
-  margin-bottom:20px;
-}
+.lobby h2 { text-align:center; margin-bottom:8px; }
+.lobby p { text-align:center; color:var(--muted); }
 
 input {
   width:100%;
@@ -169,33 +147,13 @@ input {
   text-align:center;
 }
 
-/* ---------- BUSINESS ---------- */
-
-.business {
-  border-top:1px solid var(--border);
-  padding:60px 0 20px;
-  text-align:center;
-}
-
-.business h2 {
-  margin-bottom:10px;
-}
-
-.business p {
-  color:var(--muted);
-  margin-bottom:20px;
-}
-
-/* ---------- FOOTER ---------- */
-
+/* FOOTER */
 footer {
   text-align:center;
   padding:40px 0;
   font-size:.85rem;
   color:var(--muted);
 }
-
-/* ---------- RESPONSIVE ---------- */
 
 @media(max-width:900px) {
   .features { grid-template-columns:1fr; }
@@ -246,19 +204,13 @@ footer {
   <h2>Join the Live DC Lobby</h2>
   <p>Find people nearby who want to do the same thing.</p>
 
-  <input placeholder="Your name (first name or nickname)">
-  <input placeholder="Interest (Dog walk, Coffee, Chess)">
-  <button class="primary" style="width:100%">Broadcast My Presence</button>
+  <input id="username" placeholder="Your name (first name or nickname)">
+  <input id="interest" placeholder="Interest (Dog walk, Coffee, Chess)">
+  <button class="primary" style="width:100%" onclick="broadcast()">Broadcast My Presence</button>
 
   <div class="helper">
     You’ll appear instantly. Chat and meetups unlock when at least two people match.
   </div>
-</section>
-
-<section class="container business">
-  <h2>Own a café, bar, or community space?</h2>
-  <p>Meetra helps venues turn quiet hours into real social moments.</p>
-  <button class="secondary">Book a Demo</button>
 </section>
 
 <footer>
@@ -266,11 +218,44 @@ footer {
 </footer>
 
 <script>
+/* Smooth scroll */
 function scrollToLobby() {
   document.getElementById('dc-lobby').scrollIntoView({
     behavior: 'smooth',
     block: 'start'
   });
+}
+
+/* Supabase */
+const SUPABASE_URL = 'https://ggirvskmmgeegjhstiqe.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_2iQ5bRLoZa9rlmk2m67tMw_5cgYW5H9';
+
+const supabaseClient = supabase.createClient(
+  SUPABASE_URL,
+  SUPABASE_KEY
+);
+
+/* Broadcast presence */
+async function broadcast() {
+  const name = document.getElementById('username').value.trim();
+  const interest = document.getElementById('interest').value.trim().toLowerCase();
+
+  if (!name || !interest) {
+    alert('Please enter both your name and an interest.');
+    return;
+  }
+
+  const { error } = await supabaseClient
+    .from('profiles')
+    .insert([{ username: name, interest }]);
+
+  if (error) {
+    console.error(error);
+    alert('Unable to broadcast. Please try again.');
+    return;
+  }
+
+  alert('You are now live in the DC Lobby.');
 }
 </script>
 
