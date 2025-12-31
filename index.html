@@ -31,7 +31,6 @@ body {
 }
 
 /* HERO */
-
 header {
   text-align:center;
   padding:72px 0 40px;
@@ -42,12 +41,6 @@ header {
   font-weight:900;
 }
 .logo span { color:var(--primary); }
-
-.tagline {
-  font-size:.9rem;
-  color:var(--muted);
-  margin-top:6px;
-}
 
 h1 {
   font-size:3rem;
@@ -70,11 +63,9 @@ h1 span { color:var(--primary); }
   border:none;
   font-weight:700;
   cursor:pointer;
-  font-size:1rem;
 }
 
 /* FEATURES */
-
 .features {
   display:grid;
   grid-template-columns:repeat(3,1fr);
@@ -97,11 +88,6 @@ h1 span { color:var(--primary); }
 }
 
 /* JOIN + LOBBY */
-
-#joinSection {
-  display:none;
-}
-
 .card {
   max-width:480px;
   margin:40px auto;
@@ -153,44 +139,44 @@ input {
 
 <header class="container">
   <div class="logo">Meetra<span>.to</span></div>
-  <div class="tagline">meet • real • now</div>
 
   <h1>Stop scrolling. <span>Start meeting.</span></h1>
   <p class="subhead">
     Turn shared interests into real-world hangouts at verified local spots — live.
   </p>
 
-  <button class="primary" onclick="showJoin()">Enter the DC Lobby</button>
+  <button class="primary" onclick="document.getElementById('nameInput').focus()">
+    Enter the DC Lobby
+  </button>
 </header>
 
 <section class="container features">
   <div class="feature">
     <img src="https://images.unsplash.com/photo-1521737604893-d14cc237f11d">
     <h3>Instant Matching</h3>
-    <p>See who nearby wants to meet right now.</p>
   </div>
-
   <div class="feature">
     <img src="https://images.unsplash.com/photo-1559339352-11d035aa65de">
     <h3>Real Places</h3>
-    <p>Meetups happen at verified public venues.</p>
   </div>
-
   <div class="feature">
     <img src="https://images.unsplash.com/photo-1549923746-c502d488b3ea">
     <h3>Safe by Design</h3>
-    <p>Public, time-limited, group-first interactions.</p>
   </div>
 </section>
 
-<section class="container" id="joinSection">
-  <div class="card">
+<!-- JOIN FORM (ALWAYS VISIBLE) -->
+<section class="container">
+  <div class="card" id="joinCard">
     <input id="nameInput" placeholder="Your name">
     <input id="interestInput" placeholder="Interest (Coffee, Dog walk)">
-    <button class="primary" style="width:100%" onclick="enterLobby()">Enter the DC Lobby</button>
+    <button class="primary" style="width:100%" onclick="enterLobby()">
+      Enter the DC Lobby
+    </button>
   </div>
 </section>
 
+<!-- LOBBY -->
 <section id="lobbySection">
   <div id="userList"></div>
   <button class="exit" onclick="exitLobby()">Exit Lobby</button>
@@ -206,12 +192,6 @@ const SESSION_ID = crypto.randomUUID();
 let CURRENT = {};
 let poller;
 
-/* Reveal join form */
-function showJoin() {
-  document.getElementById('joinSection').style.display = 'block';
-}
-
-/* Enter lobby */
 async function enterLobby() {
   const username = nameInput.value.trim();
   const interest = interestInput.value.trim().toLowerCase();
@@ -225,14 +205,13 @@ async function enterLobby() {
 
   await supabaseClient.from('profiles').insert([CURRENT]);
 
-  document.getElementById('joinSection').style.display = 'none';
-  document.getElementById('lobbySection').style.display = 'block';
+  joinCard.style.display = 'none';
+  lobbySection.style.display = 'block';
 
   await loadLobby();
   poller = setInterval(loadLobby, 4000);
 }
 
-/* Load lobby */
 async function loadLobby() {
   const { data } = await supabaseClient
     .from('profiles')
@@ -248,7 +227,6 @@ async function loadLobby() {
   });
 }
 
-/* Exit lobby */
 async function exitLobby() {
   clearInterval(poller);
   await supabaseClient.from('profiles').delete().eq('session_id', SESSION_ID);
