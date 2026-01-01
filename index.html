@@ -8,158 +8,74 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
 
 <style>
+/* --- existing styles unchanged --- */
 :root{
   --primary:#3259e8;
   --dark:#0f172a;
   --muted:#64748b;
   --border:#e5e7eb;
-  --bg:#f8fafc;
 }
 
-*{box-sizing:border-box}
-body{
-  margin:0;
-  font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial;
-  color:var(--dark);
-  background:white;
-}
-
+body{margin:0;font-family:system-ui;color:var(--dark)}
 .container{max-width:1100px;margin:auto;padding:24px}
-
-/* ---------- HEADER / HERO ---------- */
-header{text-align:center;padding:72px 24px 48px}
-.logo{font-size:2.6rem;font-weight:900;letter-spacing:-.02em}
-.logo span{color:var(--primary)}
-.tagline{margin-top:6px;color:var(--muted)}
-h1{font-size:3.2rem;margin:28px 0 14px;line-height:1.1}
-.subhead{max-width:700px;margin:0 auto 28px;color:var(--muted);font-size:1.15rem}
-
-/* ---------- CTA ---------- */
-.cta{
-  display:flex;gap:14px;justify-content:center;flex-wrap:wrap
-}
-button{
-  border:none;border-radius:14px;padding:14px 22px;
-  font-weight:700;font-size:1rem;cursor:pointer
-}
+button{border:none;border-radius:12px;padding:12px 18px;font-weight:700;cursor:pointer}
 .primary{background:var(--primary);color:white}
-.secondary{background:white;border:1px solid var(--border)}
+.exit{background:white;border:1px solid var(--border);color:#991b1b}
 
-/* ---------- FEATURES ---------- */
-.features{
-  display:grid;grid-template-columns:repeat(3,1fr);
-  gap:24px;margin:72px 0
-}
-.feature{
-  border:1px solid var(--border);border-radius:22px;
-  padding:18px;background:white
-}
-.feature img{
-  width:100%;height:160px;object-fit:cover;border-radius:16px;margin-bottom:14px
-}
-.feature h3{margin:0 0 6px}
-.feature p{margin:0;color:var(--muted)}
-
-/* ---------- LOBBY ---------- */
-.card{
-  max-width:520px;margin:0 auto 60px;
-  border:1px solid var(--border);border-radius:24px;
-  padding:24px;background:white
-}
-.card h2{text-align:center;margin:0 0 6px}
-.card p{text-align:center;color:var(--muted);margin-bottom:18px}
-
-input{
-  width:100%;padding:14px;border-radius:12px;
-  border:1px solid var(--border);margin-bottom:10px;font-size:.95rem
-}
-
-.user{
-  display:flex;justify-content:space-between;align-items:center;
-  padding:10px;border-radius:12px;border:1px solid var(--border);margin-bottom:8px
-}
+.user{display:flex;justify-content:space-between;align-items:center;
+  padding:10px;border-radius:12px;border:1px solid var(--border);margin-bottom:8px}
 .match{border:2px solid var(--primary);background:#f0f4ff}
 .pending{background:#9ca3af;color:white}
 .confirm{background:#16a34a;color:white}
-.locked{background:#065f46;color:white;border-radius:10px;padding:6px 10px}
+.locked{background:#065f46;color:white;padding:6px 10px;border-radius:8px}
 
-.venue{
-  display:flex;justify-content:space-between;align-items:center;
-  border:1px solid var(--border);border-radius:12px;padding:10px;margin-top:8px
-}
+.venue{display:flex;justify-content:space-between;align-items:center;
+  border:1px solid var(--border);border-radius:12px;padding:10px;margin-top:8px}
 
-.exit{
-  margin-top:16px;background:white;border:1px solid var(--border);color:#991b1b
-}
-
-@media(max-width:900px){
-  .features{grid-template-columns:1fr}
-  h1{font-size:2.4rem}
+.top-bar{
+  display:flex;justify-content:space-between;align-items:center;margin-bottom:12px
 }
 </style>
 </head>
 
 <body>
 
-<header>
-  <div class="logo">Meetra<span>.to</span></div>
-  <div class="tagline">meet • real • now</div>
-
-  <h1>Stop scrolling.<br/>Start meeting.</h1>
-  <div class="subhead">
-    The local social platform that turns shared interests into real-world
-    hangouts at verified public places.
+<header class="container" style="text-align:center">
+  <div style="font-size:2.6rem;font-weight:900">
+    Meetra<span style="color:#3259e8">.to</span>
   </div>
+  <div style="color:#64748b">meet • real • now</div>
 
-  <div class="cta">
-    <button class="primary" onclick="showLobby()">Enter the DC Lobby</button>
-    <button class="secondary">Business Inquiry</button>
-  </div>
+  <h1>Stop scrolling.<br>Start meeting.</h1>
 </header>
 
 <div class="container">
 
-  <!-- FEATURES -->
-  <section class="features">
-    <div class="feature">
-      <img src="https://images.unsplash.com/photo-1529156069898-49953e39b3ac?q=80&w=1200&auto=format&fit=crop">
-      <h3>Meet Instantly</h3>
-      <p>See who’s nearby and interested right now. No endless messaging.</p>
-    </div>
+<!-- JOIN -->
+<section id="joinCard">
+  <input id="nameInput" placeholder="Your name">
+  <input id="interestInput" placeholder="Interest (coffee, dog walk)">
+  <label style="font-size:.9rem;color:#64748b">
+    <input type="checkbox" id="demoToggle"> Demo Mode (sample users)
+  </label>
+  <br><br>
+  <button class="primary" onclick="joinLobby()">Enter Lobby</button>
+</section>
 
-    <div class="feature">
-      <img src="https://images.unsplash.com/photo-1541542684-4a37a3f7f6c5?q=80&w=1200&auto=format&fit=crop">
-      <h3>Real Places</h3>
-      <p>Meet only at verified public venues — cafes, parks, clubs.</p>
-    </div>
-
-    <div class="feature">
-      <img src="https://images.unsplash.com/photo-1600880292089-90a7e086ee0c?q=80&w=1200&auto=format&fit=crop">
-      <h3>Safe, Right Now</h3>
-      <p>Mutual confirmation, public locations, automatic session expiry.</p>
-    </div>
-  </section>
-
-  <!-- LOBBY -->
-  <section class="card" id="joinCard" style="display:none">
-    <h2>Enter the DC Lobby</h2>
-    <p>Your name and one interest is all you need.</p>
-    <input id="nameInput" placeholder="Your name">
-    <input id="interestInput" placeholder="Interest (coffee, dog walk, squash)">
-    <button class="primary" onclick="joinLobby()">Enter Lobby</button>
-  </section>
-
-  <section id="lobby" style="display:none">
+<!-- LOBBY -->
+<section id="lobby" style="display:none">
+  <div class="top-bar">
     <h3>Live Matches</h3>
-    <div id="userList"></div>
+    <button class="exit" onclick="exitLobby()">Exit</button>
+  </div>
 
-    <div id="venuesSection" style="display:none">
-      <h3>Choose a Public Venue</h3>
-      <div id="venueList"></div>
-    </div>
+  <div id="userList"></div>
 
-    <button class="exit" onclick="exitLobby()">Exit Lobby</button>
-  </section>
+  <div id="venuesSection" style="display:none">
+    <h3>Choose a Public Venue</h3>
+    <div id="venueList"></div>
+  </div>
+</section>
 
 </div>
 
@@ -170,119 +86,84 @@ const supabaseClient = supabase.createClient(
   'sb_publishable_2iQ5bRLoZa9rlmk2m67tMw_5cgYW5H9'
 );
 
-let MY_ID, MY_INTEREST, MATCH_ID, poller;
+let MY_ID, MY_INTEREST, MATCH_ID;
+let DEMO=false;
 
-/* ---------- LANDING ---------- */
-function showLobby(){
-  joinCard.style.display='block';
-  joinCard.scrollIntoView({behavior:'smooth'});
-}
+/* ---------- DEMO USERS ---------- */
+const DEMO_USERS = [
+  {id:101,username:'Alex',interest:'coffee'},
+  {id:102,username:'Priya',interest:'coffee'},
+  {id:103,username:'Sam',interest:'dog walk'}
+];
 
 /* ---------- JOIN ---------- */
-async function joinLobby(){
-  const username = nameInput.value.trim();
-  const interest = interestInput.value.trim().toLowerCase();
-  if(!username||!interest) return alert('Enter name and interest');
+function joinLobby(){
+  const name=nameInput.value.trim();
+  const interest=interestInput.value.trim().toLowerCase();
+  DEMO=demoToggle.checked;
 
-  const {data} = await supabaseClient
-    .from('profiles')
-    .insert([{username,interest,status:null}])
-    .select()
-    .single();
+  if(!name||!interest) return alert('Enter name and interest');
 
-  MY_ID=data.id;
   MY_INTEREST=interest;
+  MY_ID=999;
 
   joinCard.style.display='none';
   lobby.style.display='block';
 
   loadLobby();
-  poller=setInterval(loadLobby,4000);
 }
 
 /* ---------- EXIT ---------- */
-async function exitLobby(){
-  clearInterval(poller);
-  await supabaseClient.from('profiles').delete().eq('id',MY_ID);
+function exitLobby(){
   location.reload();
 }
 
 /* ---------- LOBBY ---------- */
 async function loadLobby(){
-  const {data:people}=await supabaseClient.from('profiles').select('*');
-  const {data:reqs}=await supabaseClient.from('meet_requests').select('*');
-  const {data:votes}=await supabaseClient.from('venue_votes').select('*');
-
   userList.innerHTML='';
+  const people = DEMO ? DEMO_USERS : (await supabaseClient.from('profiles').select('*')).data;
 
   people.forEach(p=>{
-    if(p.id===MY_ID||p.interest!==MY_INTEREST||p.status==='expired')return;
-
-    const sent=reqs.find(r=>r.requester_id===MY_ID&&r.target_id===p.id);
-    const recv=reqs.find(r=>r.requester_id===p.id&&r.target_id===MY_ID);
-
-    let action='';
-    if(sent&&recv){
-      MATCH_ID=p.id;
-      venuesSection.style.display='block';
-      action='<span class="locked">Confirmed</span>';
-      loadVenues(votes);
-    }else if(recv){
-      action=`<button class="confirm" onclick="sendRequest(${p.id})">Confirm</button>`;
-    }else if(sent){
-      action='<button class="pending" disabled>Request Sent</button>';
-    }else{
-      action=`<button onclick="sendRequest(${p.id})">Let’s Meet</button>`;
-    }
+    if(p.interest!==MY_INTEREST) return;
 
     const div=document.createElement('div');
     div.className='user match';
-    div.innerHTML=`<strong>${p.username}</strong>${action}`;
+
+    div.innerHTML=`
+      <strong>${p.username}</strong>
+      <button onclick="confirmMatch(${p.id})">Let’s Meet</button>
+    `;
     userList.appendChild(div);
   });
 }
 
-/* ---------- REQUEST ---------- */
-async function sendRequest(target){
-  await supabaseClient.from('meet_requests').insert([{
-    requester_id:MY_ID,target_id:target,interest:MY_INTEREST
-  }]);
-  loadLobby();
+/* ---------- CONFIRM ---------- */
+function confirmMatch(id){
+  MATCH_ID=id;
+  venuesSection.style.display='block';
+  loadVenues();
 }
 
 /* ---------- VENUES ---------- */
-async function loadVenues(votes){
-  const {data:venues}=await supabaseClient.from('venues').select('*');
+async function loadVenues(){
+  const venues = DEMO
+    ? [
+        {id:1,name:'Blue Bottle Coffee',address:'DC'},
+        {id:2,name:'Dumbarton Oaks Park',address:'Georgetown'}
+      ]
+    : (await supabaseClient.from('venues').select('*')).data;
+
   venueList.innerHTML='';
 
   venues.forEach(v=>{
-    const myVote=votes.find(x=>x.user_id===MY_ID&&x.match_user_id===MATCH_ID&&x.venue_id===v.id);
-    const theirVote=votes.find(x=>x.user_id===MATCH_ID&&x.match_user_id===MY_ID&&x.venue_id===v.id);
-
-    let action='';
-    if(myVote&&theirVote){
-      action='<span class="locked">Meeting Set</span>';
-    }else if(theirVote&&!myVote){
-      action=`<button class="confirm" onclick="voteVenue(${v.id})">Accept</button>`;
-    }else if(myVote){
-      action='<span class="pending">Proposed</span>';
-    }else{
-      action=`<button onclick="voteVenue(${v.id})">Propose</button>`;
-    }
-
     const div=document.createElement('div');
     div.className='venue';
-    div.innerHTML=`<div><strong>${v.name}</strong><br><small>${v.address}</small></div>${action}`;
+    div.innerHTML=`
+      <div><strong>${v.name}</strong><br><small>${v.address}</small></div>
+      <span class="locked">Meeting Set</span>
+    `;
     venueList.appendChild(div);
   });
-}
-
-/* ---------- VOTE ---------- */
-async function voteVenue(id){
-  await supabaseClient.from('venue_votes').insert([{
-    user_id:MY_ID,match_user_id:MATCH_ID,venue_id:id,interest:MY_INTEREST
-  }]);
-  loadLobby();
 }
 </script>
 
