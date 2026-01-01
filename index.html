@@ -8,7 +8,6 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
 
 <style>
-/* --- existing styles unchanged --- */
 :root{
   --primary:#3259e8;
   --dark:#0f172a;
@@ -16,150 +15,332 @@
   --border:#e5e7eb;
 }
 
-body{margin:0;font-family:system-ui;color:var(--dark)}
+*{box-sizing:border-box}
+
+body{
+  margin:0;
+  font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial;
+  color:var(--dark);
+  background:white;
+}
+
 .container{max-width:1100px;margin:auto;padding:24px}
-button{border:none;border-radius:12px;padding:12px 18px;font-weight:700;cursor:pointer}
+
+/* ---------- HERO ---------- */
+header{
+  text-align:center;
+  padding:72px 24px 48px;
+}
+
+.logo{
+  font-size:2.6rem;
+  font-weight:900;
+}
+.logo span{color:var(--primary)}
+.tagline{color:var(--muted);margin-top:6px}
+
+h1{
+  font-size:3.2rem;
+  margin:28px 0 14px;
+  line-height:1.1;
+}
+
+.subhead{
+  max-width:720px;
+  margin:0 auto 28px;
+  color:var(--muted);
+  font-size:1.15rem;
+}
+
+.cta{
+  display:flex;
+  gap:14px;
+  justify-content:center;
+  flex-wrap:wrap;
+}
+
+button{
+  border:none;
+  border-radius:14px;
+  padding:14px 22px;
+  font-weight:700;
+  font-size:1rem;
+  cursor:pointer;
+}
+
 .primary{background:var(--primary);color:white}
-.exit{background:white;border:1px solid var(--border);color:#991b1b}
+.secondary{background:white;border:1px solid var(--border)}
 
-.user{display:flex;justify-content:space-between;align-items:center;
-  padding:10px;border-radius:12px;border:1px solid var(--border);margin-bottom:8px}
-.match{border:2px solid var(--primary);background:#f0f4ff}
-.pending{background:#9ca3af;color:white}
-.confirm{background:#16a34a;color:white}
-.locked{background:#065f46;color:white;padding:6px 10px;border-radius:8px}
+/* ---------- FEATURES ---------- */
+.features{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:24px;
+  margin:72px 0;
+}
 
-.venue{display:flex;justify-content:space-between;align-items:center;
-  border:1px solid var(--border);border-radius:12px;padding:10px;margin-top:8px}
+.feature{
+  border:1px solid var(--border);
+  border-radius:22px;
+  padding:18px;
+}
+
+.feature img{
+  width:100%;
+  height:160px;
+  object-fit:cover;
+  border-radius:16px;
+  margin-bottom:14px;
+}
+
+.feature h3{margin:0 0 6px}
+.feature p{margin:0;color:var(--muted)}
+
+/* ---------- LOBBY ---------- */
+.card{
+  max-width:520px;
+  margin:0 auto 60px;
+  border:1px solid var(--border);
+  border-radius:24px;
+  padding:24px;
+}
+
+input{
+  width:100%;
+  padding:14px;
+  border-radius:12px;
+  border:1px solid var(--border);
+  margin-bottom:10px;
+}
+
+.user{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:10px;
+  border-radius:12px;
+  border:1px solid var(--border);
+  margin-bottom:8px;
+}
+
+.match{
+  border:2px solid var(--primary);
+  background:#f0f4ff;
+}
+
+.locked{
+  background:#065f46;
+  color:white;
+  padding:6px 10px;
+  border-radius:8px;
+}
+
+.venue{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  border:1px solid var(--border);
+  border-radius:12px;
+  padding:10px;
+  margin-top:8px;
+}
 
 .top-bar{
-  display:flex;justify-content:space-between;align-items:center;margin-bottom:12px
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:12px;
+}
+
+.exit{
+  background:white;
+  border:1px solid var(--border);
+  color:#991b1b;
+}
+
+/* ---------- DEMO BADGE ---------- */
+.badge{
+  display:inline-block;
+  background:#fde68a;
+  color:#92400e;
+  font-size:.75rem;
+  font-weight:700;
+  padding:4px 10px;
+  border-radius:999px;
+  margin-left:8px;
+}
+
+.helper{
+  font-size:.85rem;
+  color:var(--muted);
+  text-align:center;
+  margin-top:10px;
+}
+
+@media(max-width:900px){
+  .features{grid-template-columns:1fr}
+  h1{font-size:2.4rem}
 }
 </style>
 </head>
 
 <body>
 
-<header class="container" style="text-align:center">
-  <div style="font-size:2.6rem;font-weight:900">
-    Meetra<span style="color:#3259e8">.to</span>
-  </div>
-  <div style="color:#64748b">meet • real • now</div>
+<header>
+  <div class="logo">Meetra<span>.to</span></div>
+  <div class="tagline">meet • real • now</div>
 
   <h1>Stop scrolling.<br>Start meeting.</h1>
+
+  <div class="subhead">
+    Turn shared interests into real-world hangouts at verified public places.
+  </div>
+
+  <div class="cta">
+    <button class="primary" onclick="showLobby()">Enter the DC Lobby</button>
+    <button class="secondary">Business Inquiry</button>
+  </div>
 </header>
 
 <div class="container">
 
-<!-- JOIN -->
-<section id="joinCard">
-  <input id="nameInput" placeholder="Your name">
-  <input id="interestInput" placeholder="Interest (coffee, dog walk)">
-  <label style="font-size:.9rem;color:#64748b">
-    <input type="checkbox" id="demoToggle"> Demo Mode (sample users)
-  </label>
-  <br><br>
-  <button class="primary" onclick="joinLobby()">Enter Lobby</button>
-</section>
+  <!-- FEATURES -->
+  <section class="features">
+    <div class="feature">
+      <img src="https://images.unsplash.com/photo-1529156069898-49953e39b3ac?q=80&w=1200&auto=format&fit=crop">
+      <h3>Meet Instantly</h3>
+      <p>See who’s nearby and interested — right now.</p>
+    </div>
 
-<!-- LOBBY -->
-<section id="lobby" style="display:none">
-  <div class="top-bar">
-    <h3>Live Matches</h3>
-    <button class="exit" onclick="exitLobby()">Exit</button>
-  </div>
+    <div class="feature">
+      <img src="https://images.unsplash.com/photo-1529333166437-7750a6dd5a70?q=80&w=1200&auto=format&fit=crop">
+      <h3>Real Places</h3>
+      <p>Only verified public venues. No private locations.</p>
+    </div>
 
-  <div id="userList"></div>
+    <div class="feature">
+      <img src="https://images.unsplash.com/photo-1600880292089-90a7e086ee0c?q=80&w=1200&auto=format&fit=crop">
+      <h3>Safe, Right Now</h3>
+      <p>Mutual confirmation and automatic session expiry.</p>
+    </div>
+  </section>
 
-  <div id="venuesSection" style="display:none">
-    <h3>Choose a Public Venue</h3>
-    <div id="venueList"></div>
-  </div>
-</section>
+  <!-- JOIN -->
+  <section class="card" id="joinCard" style="display:none">
+    <h2>Enter the DC Lobby</h2>
+
+    <input id="nameInput" placeholder="Your name">
+    <input id="interestInput" placeholder="Interest (coffee, dog walk)">
+
+    <label>
+      <input type="checkbox" id="demoToggle">
+      Demo Mode
+      <span class="badge">1-min demo</span>
+    </label>
+
+    <div class="helper">
+      Try it solo — see a full match flow in under a minute.
+    </div>
+
+    <br>
+    <button class="primary" onclick="joinLobby()">Enter Lobby</button>
+  </section>
+
+  <!-- LOBBY -->
+  <section id="lobby" style="display:none">
+    <div class="top-bar">
+      <h3>
+        Live Matches
+        <span id="demoBadge" class="badge" style="display:none">Demo</span>
+      </h3>
+      <button class="exit" onclick="resetDemo()">Reset</button>
+    </div>
+
+    <div id="userList"></div>
+
+    <div id="venuesSection" style="display:none">
+      <h3>Choose a Public Venue</h3>
+      <div id="venueList"></div>
+    </div>
+  </section>
 
 </div>
 
 <script>
-/* ---------- SUPABASE ---------- */
-const supabaseClient = supabase.createClient(
-  'https://ggirvskmmgeegjhstiqe.supabase.co',
-  'sb_publishable_2iQ5bRLoZa9rlmk2m67tMw_5cgYW5H9'
-);
-
-let MY_ID, MY_INTEREST, MATCH_ID;
-let DEMO=false;
-
-/* ---------- DEMO USERS ---------- */
+/* ---------- DEMO DATA ---------- */
 const DEMO_USERS = [
-  {id:101,username:'Alex',interest:'coffee'},
-  {id:102,username:'Priya',interest:'coffee'},
-  {id:103,username:'Sam',interest:'dog walk'}
+  {id:1,username:'Alex',interest:'coffee'},
+  {id:2,username:'Priya',interest:'coffee'},
+  {id:3,username:'Sam',interest:'dog walk'}
 ];
+
+const DEMO_VENUES = [
+  {id:1,name:'Blue Bottle Coffee',address:'Downtown DC'},
+  {id:2,name:'Dumbarton Oaks Park',address:'Georgetown'}
+];
+
+let DEMO=false, MY_INTEREST;
+
+/* ---------- LANDING ---------- */
+function showLobby(){
+  joinCard.style.display='block';
+  joinCard.scrollIntoView({behavior:'smooth'});
+}
 
 /* ---------- JOIN ---------- */
 function joinLobby(){
-  const name=nameInput.value.trim();
-  const interest=interestInput.value.trim().toLowerCase();
+  MY_INTEREST=interestInput.value.trim().toLowerCase();
   DEMO=demoToggle.checked;
 
-  if(!name||!interest) return alert('Enter name and interest');
-
-  MY_INTEREST=interest;
-  MY_ID=999;
+  if(!MY_INTEREST) return alert('Enter an interest');
 
   joinCard.style.display='none';
   lobby.style.display='block';
+  demoBadge.style.display=DEMO?'inline-block':'none';
 
   loadLobby();
 }
 
-/* ---------- EXIT ---------- */
-function exitLobby(){
+/* ---------- RESET ---------- */
+function resetDemo(){
   location.reload();
 }
 
 /* ---------- LOBBY ---------- */
-async function loadLobby(){
+function loadLobby(){
   userList.innerHTML='';
-  const people = DEMO ? DEMO_USERS : (await supabaseClient.from('profiles').select('*')).data;
+  const people=DEMO?DEMO_USERS:[];
 
   people.forEach(p=>{
     if(p.interest!==MY_INTEREST) return;
 
     const div=document.createElement('div');
     div.className='user match';
-
     div.innerHTML=`
       <strong>${p.username}</strong>
-      <button onclick="confirmMatch(${p.id})">Let’s Meet</button>
+      <button onclick="confirmMatch()">Let’s Meet</button>
     `;
     userList.appendChild(div);
   });
 }
 
 /* ---------- CONFIRM ---------- */
-function confirmMatch(id){
-  MATCH_ID=id;
+function confirmMatch(){
   venuesSection.style.display='block';
   loadVenues();
 }
 
 /* ---------- VENUES ---------- */
-async function loadVenues(){
-  const venues = DEMO
-    ? [
-        {id:1,name:'Blue Bottle Coffee',address:'DC'},
-        {id:2,name:'Dumbarton Oaks Park',address:'Georgetown'}
-      ]
-    : (await supabaseClient.from('venues').select('*')).data;
-
+function loadVenues(){
   venueList.innerHTML='';
-
-  venues.forEach(v=>{
+  DEMO_VENUES.forEach(v=>{
     const div=document.createElement('div');
     div.className='venue';
     div.innerHTML=`
-      <div><strong>${v.name}</strong><br><small>${v.address}</small></div>
+      <div>
+        <strong>${v.name}</strong><br>
+        <small>${v.address}</small>
+      </div>
       <span class="locked">Meeting Set</span>
     `;
     venueList.appendChild(div);
